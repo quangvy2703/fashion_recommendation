@@ -40,12 +40,12 @@ class Training:
 
         customer_encoder_output = customer_encoder(customer_tensor)
 
-        print(customer_encoder_output.size(), transaction_encoder_outputs.size(), transaction_encoder_hidden.size())
+        # print(customer_encoder_output.size(), transaction_encoder_outputs.size(), transaction_encoder_hidden.size())
         decoder_output, decoder_attention = decoder(
             customer_encoder_output, transaction_encoder_outputs, transaction_encoder_hidden)
 
-        print(decoder_output.size(), target_tensor.size())
-        print(decoder_output, target_tensor)
+        # print(decoder_output.size(), target_tensor.size())
+        # print(decoder_output, target_tensor)
         # target_tensor = target_tensor.long()
         loss = criterion(decoder_output, target_tensor)
 
@@ -110,7 +110,7 @@ class Training:
 
     def run_evaluate(self, transaction_encoder, customer_encoder, decoder, valid_loader, epoch):
         with torch.no_grad():
-            criterion = nn.NLLLoss()
+            criterion = nn.CrossEntropyLoss()
             total_loss = 0
             total = 0
             correct = 0
@@ -138,7 +138,7 @@ class Training:
 
 
         for ei in range(input_length):
-            encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[ei], transaction_encoder_hidden)
+            encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
             transaction_encoder_outputs[ei] = encoder_output[0, 0]
 
         customer_encoder_output = customer_encoder(customer_tensor)
