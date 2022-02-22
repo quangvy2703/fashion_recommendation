@@ -6,7 +6,7 @@ import os
 import argparse
 from encoder_train import Training
 from config import cfg
-from dataset import FashionDataset
+# from dataset import FashionDataset
 import pickle
 import pandas as pd
 # from tqdm import tqdm
@@ -92,7 +92,6 @@ if __name__ == '__main__':
     cfg['LR'] = args.lr
 
     
-    train_dataset = FashionDataset(cfg, cfg['DATA_DIR'], 'train')
 
     trainer = Training(cfg)
     trainer.start_training()

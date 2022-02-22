@@ -24,7 +24,7 @@ class FashionDataset(Dataset):
         with open(os.path.join(data_dir, 'all_samples.pkl'), 'rb') as f:
             self.samples = pickle.load(f)
         
-        with open(os.path.join(data_dir, phase + '.pkl'), 'rb') as f:
+        with open(os.path.join(data_dir, phase + '_indexes.pkl'), 'rb') as f:
             self.indexes = pickle.load(f) 
 
         with open("datasets/articles_processed.pkl", "rb") as f:
