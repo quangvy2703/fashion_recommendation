@@ -102,7 +102,7 @@ class AttnDecoder(nn.Module):
         # print(output)
         # output = F.log_softmax(output, dim=1)
         # print(output)
-        return output, attn_weights
+        return output[0], attn_weights
 
     def initHidden(self):
         return torch.zeros(1, 1, self.hidden_size, device=device)
