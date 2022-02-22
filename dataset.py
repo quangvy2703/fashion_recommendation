@@ -63,18 +63,18 @@ class FashionDataset(Dataset):
         for customer_id in tqdm(customer_ids):
             transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
             transaction = transaction_of_customer['article_id'].values
-            if len(transaction) < MIN_SEQUENCE_LENGTH:
+            if len(transaction) < cfg.MIN_SEQUENCE_LENGTH:
                 continue
 
             excuce_date = transaction_of_customer.t_dat.values
             from_last = np.asarray(excuce_date) - np.asarray([np.datetime64('0-01-01'), *excuce_date[:-1]])
             transaction_of_customer['from_last'] = from_last.astype('timedelta64[D]').astype(np.int32)
 
-            indexes = np.array(transaction_of_customer[transaction_of_customer['from_last'] <= PERIODS].index.to_list())
+            indexes = np.array(transaction_of_customer[transaction_of_customer['from_last'] <= cfg.PERIODS].index.to_list())
             indexes = np.sort(np.unique(np.append(indexes, indexes-1)))
 
             transaction_sessions = transaction_of_customer.iloc[indexes].reset_index(drop=True)
-            split_indexes = transaction_sessions.from_last[transaction_sessions.from_last > PERIODS].index.to_list()
+            split_indexes = transaction_sessions.from_last[transaction_sessions.from_last > cfg.PERIODS].index.to_list()
             transaction_sessions = np.split(transaction_sessions.article_id.values, split_indexes[1:])
 
             customer_sequences[customer_id] = []
@@ -92,7 +92,7 @@ class FashionDataset(Dataset):
 
 
     def article_processing(self):
-        articles_df = pd.read_csv(ARTICLES_PATH)
+        articles_df = pd.read_csv(cfg.ARTICLES_PATH)
         article_infor = articles_df[ARTICLE_FEATURES]
         article_mapper = DataFrameMapper([
             ('article_id', None),
@@ -116,7 +116,7 @@ class FashionDataset(Dataset):
 
     
     def customer_processing(self):
-        customers_df = pd.read_csv(CUSTOMERS_PATH)
+        customers_df = pd.read_csv(cfg.CUSTOMERS_PATH)
         customers_mapper = DataFrameMapper([
             ('customer_id', None),
             ('FN', LabelEncoder()),
@@ -129,7 +129,7 @@ class FashionDataset(Dataset):
 
         customers_df['FN'].fillna(0, inplace=True)
         customers_df['Active'].fillna(0, inplace=True)
-        customers_df['age'].fillna(AGE_FILL_VALUE, inplace=True)
+        customers_df['age'].fillna(cfg.AGE_FILL_VALUE, inplace=True)
         customers_df['club_member_status'].fillna('NA', inplace=True)
         customers_df['fashion_news_frequency'].fillna('NA', inplace=True)
         customers_df['fashion_news_frequency'].replace('None', 'NONE', inplace=True)
@@ -160,7 +160,7 @@ class FashionDataset(Dataset):
         samples['target'] = []
         samples['customer_features'] = []
         samples['sequence_features'] = []
-        articles_df = pd.read_csv(ARTICLES_PATH)
+        articles_df = pd.read_csv(cfg.ARTICLES_PATH)
         article_ids = articles_df.article_id.values
         customer_ids = customer_sequences.keys()
         for customer_id in tqdm(customer_ids):
@@ -169,8 +169,8 @@ class FashionDataset(Dataset):
             for sequence in sequences:
                 for i in range(len(sequence) - 2):
                     purchased = sequence[0: i + 2]
-                    if len(purchased) > MAX_SEQUENCE_LENGTH:
-                        purchased = purchased[-MAX_SEQUENCE_LENGTH: ]
+                    if len(purchased) > cfg.MAX_SEQUENCE_LENGTH:
+                        purchased = purchased[-cfg.MAX_SEQUENCE_LENGTH: ]
                     while True:
                         unpurchased = random.choice(article_ids)
                         if unpurchased not in sequence:

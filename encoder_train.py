@@ -11,17 +11,16 @@ from encoder_model import TransactionsEncoder, CustomerEncoder, AttnDecoder
 import time
 import math
 import random
-from config import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 teacher_forcing_ratio = 0.5
-
+config = None
 
 def train(transaction_tensor, customer_tensor, target_tensor, \
             transaction_encoder, customer_encoder, decoder,\
             transaction_encoder_optimizer, customer_encoder_optimizer, decoder_optimizer, \
-            criterion, max_length=MAX_SEQUENCE_LENGTH):
+            criterion, max_length=config.MAX_SEQUENCE_LENGTH):
     transaction_encoder_hidden = transaction_encoder.initHidden()
     transaction_encoder_optimizer.zero_grad()
     customer_encoder_optimizer.zero_grad()
@@ -39,36 +38,10 @@ def train(transaction_tensor, customer_tensor, target_tensor, \
 
     customer_encoder_output = customer_encoder(customer_tensor)
 
-    # decoder_input = torch.zeros(target_tensor[0].size(0), target_tensor[0].size(1), target_tensor[0].size(2), device=device)
-
-    # decoder_hidden = encoder_hidden
-
-    # use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
-
     decoder_output, decoder_attention = decoder(
         customer_encoder_output, transaction_encoder_outputs, transaction_encoder_hidden)
-    # topv, topi = decoder_output.topk(1)
-    # decoder_input = topi.squeeze().detach()  # detach from history as input
-
+ 
     loss = criterion(decoder_output, target_tensor)
-
-    # if use_teacher_forcing:
-    #     # Teacher forcing: Feed the target as the next input
-    #     for di in range(target_length):
-    #         decoder_output, decoder_hidden, decoder_attention = decoder(
-    #             decoder_input, decoder_hidden, encoder_outputs)
-    #         loss += criterion(decoder_output, target_tensor[di])
-    #         decoder_input = target_tensor[di]  # Teacher forcing
-
-    # else:
-    #     # Without teacher forcing: use its own predictions as the next input
-    #     for di in range(target_length):
-    #         decoder_output, decoder_hidden, decoder_attention = decoder(
-    #             decoder_input, decoder_hidden, encoder_outputs)
-    #         topv, topi = decoder_output.topk(1)
-    #         decoder_input = topi.squeeze().detach()  # detach from history as input
-
-    #         loss += criterion(decoder_output, target_tensor[di])
 
     loss.backward()
 
@@ -107,16 +80,12 @@ def run_epochs(transaction_encoder, customer_encoder, decoder, print_every=1000,
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
     train_dataset = FashionDataset(DATA_DIR, 'train')
     valid_dataset = FashionDataset(DATA_DIR, 'valid')
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(valid_dataset, BATCH_SIZE=1, shuffle=False) 
     criterion = nn.NLLLoss()
 
-# (transaction_tensor, customer_tensor, target_tensor, \
-#             transaction_encoder, customer_encoder, decoder,\
-#             transaction_encoder_optimizer, customer_encoder_optimizer, decoder_optimizer, \
-#             criterion, max_length=MAX_SEQUENCE_LENGTH)
 
-    for epoch in range(EPOCHS):
+    for epoch in range(config.EPOCHS):
         for i, data in enumerate(train_loader, 0):
             sequence_tensor = data['sequence_features']
             customer_tensor = data['customer_features']
@@ -156,7 +125,7 @@ def run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, e
             target_tensor = data['target']
 
             predicted, loss = evaluate(sequence_tensor, customer_tensor, target_tensor,
-                                        transaction_encoder, customer_encoder, decoder, criterion, MAX_SEQUENCE_LENGHT)
+                                        transaction_encoder, customer_encoder, decoder, criterion, config.MAX_SEQUENCE_LENGTH)
             total_loss += loss
             total += target_tensor.size(0)
             correct += (predicted == target_tensor).sum().item()
@@ -166,25 +135,18 @@ def run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, e
 
 def evaluate(transaction_tensor, customer_tensor, target_tensor, \
             transaction_encoder, customer_encoder, decoder,\
-            criterion, max_length=MAX_SEQUENCE_LENGTH):
+            criterion, max_length=config.MAX_SEQUENCE_LENGTH):
     transaction_encoder_hidden = transaction_encoder.initHidden()
     input_length = transaction_tensor.size(0)
 
     transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
-    loss = 0
 
     for ei in range(input_length):
         encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[ei], transaction_encoder_hidden)
         transaction_encoder_outputs[ei] = encoder_output[0, 0]
 
     customer_encoder_output = customer_encoder(customer_tensor)
-
-    # decoder_input = torch.zeros(target_tensor[0].size(0), target_tensor[0].size(1), target_tensor[0].size(2), device=device)
-
-    # decoder_hidden = encoder_hidden
-
-    # use_teacher_forcing = True if random.random() < teacher_forcing_ratio else False
 
     decoder_output, decoder_attention = decoder(
         customer_encoder_output, transaction_encoder_outputs, transaction_encoder_hidden)
@@ -193,22 +155,12 @@ def evaluate(transaction_tensor, customer_tensor, target_tensor, \
     loss = criterion(decoder_output, target_tensor)
     return predicted, loss
            
-# def evaluateRandomly(encoder, decoder, n=10):
-#     for i in range(n):
-#         pair = random.choice(pairs)
-#         print('>', pair[0])
-#         print('=', pair[1])
-#         output_words, attentions = evaluate(encoder, decoder, pair[0])
-#         output_sentence = ' '.join(output_words)
-#         print('<', output_sentence)
-#         print('')
 
-def start_training():
-    transaction_encoder = TransactionsEncoder(TRANSACTION_ENCODER_INPUT_SIZE, HIDDEN_SIZE).to(device)
-    customer_encoder = CustomerEncoder(CUSTOMER_ENCODER_INPUT_SIZE, HIDDEN_SIZE)
-    attn_decoder = AttnDecoder(HIDDEN_SIZE, N_CLASSES, dropout_p=0.1).to(device)
-# transaction_encoder, customer_encoder, decoder, print_every=1000, plot_every=100, learning_rate=0.01
-    run_epochs(transaction_encoder, customer_encoder, attn_decoder, 1000, learning_rate=LR)
+def start_training(_cfg):
+    global config
+    config = _cfg
+    transaction_encoder = TransactionsEncoder(config.TRANSACTION_ENCODER_INPUT_SIZE, config.HIDDEN_SIZE).to(device)
+    customer_encoder = CustomerEncoder(config.CUSTOMER_ENCODER_INPUT_SIZE, config.HIDDEN_SIZE).to(device)
+    attn_decoder = AttnDecoder(config.HIDDEN_SIZE, config.N_CLASSES, dropout_p=0.1).to(device)
+    run_epochs(transaction_encoder, customer_encoder, attn_decoder, 1000, learning_rate=config.LR)
 
-
-start_training()
