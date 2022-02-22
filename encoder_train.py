@@ -63,10 +63,13 @@ class Training:
         transaction_encoder_optimizer = optim.SGD(transaction_encoder.parameters(), lr=learning_rate)
         customer_encoder_optimizer = optim.SGD(customer_encoder.parameters(), lr=learning_rate)
         decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
+        print("Loading train data...")
         train_dataset = FashionDataset(self.config, self.config['DATA_DIR'], 'train')
+        print("Loading valid data...")
         valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], 'valid')
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
         valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False) 
+        print("Loaded data.")
         criterion = nn.NLLLoss()
 
 
