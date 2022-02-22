@@ -19,6 +19,7 @@ cfg["N_CLASSES"] = 2
 
 cfg["LR"] = 0.01
 
+MAX_SEQUENCE_LENGTH = 10
 ARTICLE_FEATURES = ['article_id', 'product_type_no', 'graphical_appearance_no',
                     'colour_group_code', 'perceived_colour_value_id', 'perceived_colour_master_id',
                     'department_no', 'index_code', 'index_group_no', 'section_no', 'garment_group_no']

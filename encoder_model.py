@@ -66,7 +66,7 @@ class DecoderRNN(nn.Module):
         return torch.zeros(1, 1, self.hidden_size, device=device)
 
 class AttnDecoder(nn.Module):
-    def __init__(self, hidden_size, output_size, dropout_p=0.1, max_length=cfg.MAX_SEQUENCE_LENGTH):
+    def __init__(self, hidden_size, output_size, dropout_p=0.1, max_length=MAX_SEQUENCE_LENGTH):
         super(AttnDecoder, self).__init__()
         self.hidden_size = hidden_size
         self.output_size = output_size
