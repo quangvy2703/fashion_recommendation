@@ -36,7 +36,7 @@ class Training:
         loss = 0
 
         for ei in range(input_length):
-            # print(transaction_tensor.size(), transaction_tensor[0][ei].size())
+            print(transaction_tensor.size(), transaction_tensor[0][ei].size(), transaction_encoder_hidden.size())
             encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
             transaction_encoder_outputs[ei] = encoder_output[0, 0]
 
