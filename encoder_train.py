@@ -46,6 +46,7 @@ class Training:
 
         print(decoder_output.size(), target_tensor.size())
         print(decoder_output, target_tensor)
+        # target_tensor = target_tensor.long()
         loss = criterion(decoder_output, target_tensor)
 
         loss.backward()
