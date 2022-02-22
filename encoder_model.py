@@ -99,9 +99,9 @@ class AttnDecoder(nn.Module):
         output = F.relu(output)
         # output, hidden = self.gru(output, hidden)
         output = self.out(output)
-        print(output)
+        # print(output)
         output = F.log_softmax(output, dim=1)
-        print(output)
+        # print(output)
         return output, attn_weights
 
     def initHidden(self):
