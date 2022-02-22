@@ -1,5 +1,4 @@
 from sklearn.utils import shuffle
-from config import DATA_DIR, MAX_SEQUENCE_LENGHT
 import torch
 import torch.nn as nn
 from torch import optim
@@ -78,8 +77,8 @@ def run_epochs(transaction_encoder, customer_encoder, decoder, print_every=1000,
     transaction_encoder_optimizer = optim.SGD(transaction_encoder.parameters(), lr=learning_rate)
     customer_encoder_optimizer = optim.SGD(customer_encoder.parameters(), lr=learning_rate)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
-    train_dataset = FashionDataset(DATA_DIR, 'train')
-    valid_dataset = FashionDataset(DATA_DIR, 'valid')
+    train_dataset = FashionDataset(config.DATA_DIR, 'train')
+    valid_dataset = FashionDataset(config.DATA_DIR, 'valid')
     train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
     valid_loader = DataLoader(valid_dataset, BATCH_SIZE=1, shuffle=False) 
     criterion = nn.NLLLoss()
