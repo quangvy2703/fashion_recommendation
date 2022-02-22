@@ -20,11 +20,11 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    cfg.DATA_DIR = args.data_dir
-    cfg.EPOCHS = args.epochs
-    cfg.HIDDEN_SIZE = args.hidden
-    cfg.BATCH_SIZE = args.batch_size
-    cfg.LR = args.lr
+    cfg['DATA_DIR'] = args.data_dir
+    cfg['EPOCHS'] = args.epochs
+    cfg['HIDDEN_SIZE'] = args.hidden
+    cfg['BATCH_SIZE'] = args.batch_size
+    cfg['LR'] = args.lr
 
     trainer = Training(cfg)
     trainer.start_training()

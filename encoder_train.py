@@ -28,7 +28,7 @@ class Training:
         decoder_optimizer.zero_grad()
 
         input_length = transaction_tensor.size(0)
-        max_length = self.config.MAX_SEQUENCE_LENGTH
+        max_length = self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
         loss = 0
@@ -63,14 +63,14 @@ class Training:
         transaction_encoder_optimizer = optim.SGD(transaction_encoder.parameters(), lr=learning_rate)
         customer_encoder_optimizer = optim.SGD(customer_encoder.parameters(), lr=learning_rate)
         decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
-        train_dataset = FashionDataset(self.config.DATA_DIR, 'train')
-        valid_dataset = FashionDataset(self.config.DATA_DIR, 'valid')
-        train_loader = DataLoader(train_dataset, batch_size=self.config.BATCH_SIZE, shuffle=True)
+        train_dataset = FashionDataset(self.config['DATA_DIR'], 'train')
+        valid_dataset = FashionDataset(self.config['DATA_DIR'], 'valid')
+        train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
         valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False) 
         criterion = nn.NLLLoss()
 
 
-        for epoch in range(self.config.EPOCHS):
+        for epoch in range(self.config['EPOCHS']):
             for i, data in enumerate(train_loader, 0):
                 sequence_tensor = data['sequence_features']
                 customer_tensor = data['customer_features']
@@ -123,7 +123,7 @@ class Training:
                 criterion):
         transaction_encoder_hidden = transaction_encoder.initHidden()
         input_length = transaction_tensor.size(0)
-        max_length=self.config.MAX_SEQUENCE_LENGTH
+        max_length=self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
 
@@ -142,8 +142,8 @@ class Training:
             
 
     def start_training(self):
-        transaction_encoder = TransactionsEncoder(self.config.TRANSACTION_ENCODER_INPUT_SIZE, self.config.HIDDEN_SIZE).to(device)
-        customer_encoder = CustomerEncoder(self.config.CUSTOMER_ENCODER_INPUT_SIZE, self.config.HIDDEN_SIZE).to(device)
-        attn_decoder = AttnDecoder(self.config.HIDDEN_SIZE, self.config.N_CLASSES, dropout_p=0.1).to(device)
-        self.run_epochs(transaction_encoder, customer_encoder, attn_decoder, 1000, learning_rate=self.config.LR)
+        transaction_encoder = TransactionsEncoder(self.config['TRANSACTION_ENCODER_INPUT_SIZE'], self.config['HIDDEN_SIZE']).to(device)
+        customer_encoder = CustomerEncoder(self.config['CUSTOMER_ENCODER_INPUT_SIZE'], self.config['HIDDEN_SIZE']).to(device)
+        attn_decoder = AttnDecoder(self.config['HIDDEN_SIZE'], self.config['N_CLASSES'], dropout_p=0.1).to(device)
+        self.run_epochs(transaction_encoder, customer_encoder, attn_decoder, 1000, learning_rate=self.config['LR'])
 
