@@ -7,6 +7,8 @@ from torch.utils.data import DataLoader
 from dataset import FashionDataset
 from encoder_model import TransactionsEncoder, CustomerEncoder, AttnDecoder
 
+import os
+import pickle
 import time
 import math
 import random
@@ -63,13 +65,15 @@ class Training:
         transaction_encoder_optimizer = optim.SGD(transaction_encoder.parameters(), lr=learning_rate)
         customer_encoder_optimizer = optim.SGD(customer_encoder.parameters(), lr=learning_rate)
         decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
+        with open(os.path.join(self.config['DATA_DIR'], 'all_samples.pkl'), 'rb') as f:
+            samples = pickle.load(f)
         print("Loading train data...")
-        train_dataset = FashionDataset(self.config, self.config['DATA_DIR'], 'train')
+        train_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'train')
         print("Loading valid data...")
-        valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], 'valid')
+        valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'valid')
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
         valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False) 
-        print(f"Loaded {len(train_dataset)}  train data and {len(valid_dataset)}  train data")
+        print(f"Loaded {len(train_dataset)}  train data and {len(valid_dataset)} valid data")
         criterion = nn.NLLLoss()
 
 

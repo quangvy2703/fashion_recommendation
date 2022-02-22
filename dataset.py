@@ -16,13 +16,13 @@ import torch
 from config import *
 
 class FashionDataset(Dataset):
-    def __init__(self, config, data_dir, phase):
+    def __init__(self, config, data_dir, all_samples, phase):
         self.data_dir = data_dir
         self.phase = phase
         self.config = config
-
-        with open(os.path.join(data_dir, 'all_samples.pkl'), 'rb') as f:
-            self.samples = pickle.load(f)
+        self.samples = all_samples
+        # with open(os.path.join(data_dir, 'all_samples.pkl'), 'rb') as f:
+        #     self.samples = pickle.load(f)
         
         with open(os.path.join(data_dir, phase + '_indexes.pkl'), 'rb') as f:
             self.indexes = pickle.load(f) 
