@@ -86,6 +86,7 @@ class AttnDecoder(nn.Module):
         # embedded = self.embedding(input).view(1, 1, -1)
         # embedded = self.dropout(embedded)
 
+        print(customer_encoder_output.size(),  hidden.size(), hidden[0].size())
         attn_weights = F.softmax(
             self.attn(torch.cat((customer_encoder_output, hidden[0]), 1)), dim=1)
         attn_applied = torch.bmm(attn_weights.unsqueeze(0),
