@@ -15,6 +15,7 @@ import torch
 
 from config import *
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class FashionDataset(Dataset):
     def __init__(self, config, data_dir, all_samples, phase):
         self.data_dir = data_dir
@@ -57,9 +58,9 @@ class FashionDataset(Dataset):
 
         sequence_features = [self.articles_dict[article] for article in self.samples['sequence'][index]]
         customer_features = self.customers_dict[self.samples['customer_id'][index]]
-        sequence_features = torch.tensor(sequence_features)
-        customer_features = torch.tensor(customer_features)
-        return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': torch.tensor(target)}
+        sequence_features = torch.tensor(sequence_features, device=device)
+        customer_features = torch.tensor(customer_features, device=device)
+        return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': torch.tensor(target, device=device)}
 
 
 
