@@ -30,7 +30,7 @@ class FashionDataset(Dataset):
         with open(os.path.join(self.data_dir, "articles_processed.pkl"), "rb") as f:
             articles = pickle.load(f)
 
-        with open(os.path.join(self.data_dir, "datasets/customers_processed.pkl"), "rb") as f:
+        with open(os.path.join(self.data_dir, "customers_processed.pkl"), "rb") as f:
             customers = pickle.load(f)
 
         self.articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
