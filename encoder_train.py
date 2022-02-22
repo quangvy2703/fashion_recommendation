@@ -209,3 +209,6 @@ def start_training():
     attn_decoder = AttnDecoder(HIDDEN_SIZE, N_CLASSES, dropout_p=0.1).to(device)
 # transaction_encoder, customer_encoder, decoder, print_every=1000, plot_every=100, learning_rate=0.01
     run_epochs(transaction_encoder, customer_encoder, attn_decoder, 1000, learning_rate=LR)
+
+
+start_training()
