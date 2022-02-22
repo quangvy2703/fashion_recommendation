@@ -45,6 +45,7 @@ class Training:
             customer_encoder_output, transaction_encoder_outputs, transaction_encoder_hidden)
 
         print(decoder_output.size(), target_tensor.size())
+        print(decoder_output, target_tensor)
         loss = criterion(decoder_output, target_tensor)
 
         loss.backward()
