@@ -55,8 +55,8 @@ class FashionDataset(Dataset):
         customer_features = self.samples['customer_features'][index]
         target = self.samples['target'][index]
 
-        sequence_features = [self.articles_dict[article] for article in self.samples['sequence']]
-        customer_features = self.customers_dict[random.samples['customer_id']]
+        sequence_features = [self.articles_dict[article] for article in self.samples['sequence'][index]]
+        customer_features = self.customers_dict[self.samples['customer_id'][index]]
 
         return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target}
 
