@@ -13,11 +13,11 @@ class TransactionsEncoder(nn.Module):
         super(TransactionsEncoder, self).__init__()
         self.hidden_size = hidden_size
 
-        self.embedding = nn.Embedding(input_size, self.hidden_size)
+        self.fc = nn.Linear(input_size, self.hidden_size)
         self.gru = nn.GRU(input_size, self.hidden_size)
 
     def forward(self, input, hidden):
-        embedded = self.embedding(input).view(1, 1, -1)
+        embedded = self.fc(input).view(1, 1, -1)
         output = embedded
         print(output.size())
         output, hidden = self.gru(output, hidden)
@@ -31,12 +31,12 @@ class CustomerEncoder(nn.Module):
         super(CustomerEncoder, self).__init__()
         self.hidden_size = hidden_size
 
-        self.embedding = nn.Embedding(input_size, hidden_size)
+        self.fc = nn.Linear(input_size, hidden_size)
         self.out = nn.Linear(hidden_size, 1)
         self.softmax = nn.LogSoftmax(dim=1)
 
     def foward(self, input):
-        output = self.embedding(input)
+        output = self.fc(input)
         # output = output * transaction_encoder_output
         output = self.out(output)
         output = self.softmax(output)
