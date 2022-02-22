@@ -14,7 +14,7 @@ class TransactionsEncoder(nn.Module):
         self.hidden_size = hidden_size
 
         self.fc = nn.Linear(input_size, self.hidden_size)
-        self.gru = nn.GRU(input_size, self.hidden_size)
+        self.gru = nn.GRU(self.hidden_size, self.hidden_size)
 
     def forward(self, input, hidden):
         embedded = self.fc(input).view(1, 1, -1)
