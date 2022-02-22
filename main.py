@@ -4,7 +4,7 @@ https://github.com/hengyuan-hu/bottom-up-attention-vqa
 """
 import os
 import argparse
-from encoder_train import start_training
+from encoder_train import Training
 from config import cfg
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -26,7 +26,8 @@ if __name__ == '__main__':
     cfg.BATCH_SIZE = args.batch_size
     cfg.LR = args.lr
 
-    start_training(cfg)
+    trainer = Training(cfg)
+    trainer.start_training()
 
 
  
