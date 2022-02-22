@@ -16,7 +16,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, default='datasets')
     parser.add_argument('--epochs', type=int, default=100)
-    parser.add_argument('--hidden', type=int, default=1280)
+    parser.add_argument('--hidden', type=int, default=1024)
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--lr', type=float, default=0.1)
     parser.add_argument('--seed', type=int, default=1204, help='random seed')
