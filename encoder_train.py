@@ -69,7 +69,7 @@ class Training:
         valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], 'valid')
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
         valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False) 
-        print("Loaded data.")
+        print(f"Loaded {len(train_dataset)}  train data and {len(valid_dataset)}  train data")
         criterion = nn.NLLLoss()
 
 
