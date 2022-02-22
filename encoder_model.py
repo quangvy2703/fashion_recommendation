@@ -92,14 +92,16 @@ class AttnDecoder(nn.Module):
         attn_applied = torch.bmm(attn_weights.unsqueeze(0),
                                  transaction_encoder_outputs.unsqueeze(0))
 
-        print(customer_encoder_output.size(), attn_applied.size())
+        # print(customer_encoder_output.size(), attn_applied.size())
         output = torch.cat((customer_encoder_output, attn_applied[0]), 1)
         output = self.attn_combine(output).unsqueeze(0)
 
         output = F.relu(output)
         # output, hidden = self.gru(output, hidden)
         output = self.out(output)
+        print(output)
         output = F.log_softmax(output, dim=1)
+        print(output)
         return output, attn_weights
 
     def initHidden(self):
