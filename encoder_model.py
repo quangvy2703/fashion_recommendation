@@ -32,7 +32,7 @@ class CustomerEncoder(nn.Module):
         self.hidden_size = hidden_size
 
         self.fc = nn.Linear(input_size, hidden_size)
-        self.out = nn.Linear(hidden_size, 1)
+        self.out = nn.Linear(hidden_size, hidden_size)
         # self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input):
