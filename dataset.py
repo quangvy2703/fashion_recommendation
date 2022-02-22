@@ -20,16 +20,27 @@ class FashionDataset(Dataset):
         self.data_dir = data_dir
         self.phase = phase
         self.config = config
+
         with open(os.path.join(data_dir, 'all_samples.pkl'), 'rb') as f:
             self.samples = pickle.load(f)
+        
         with open(os.path.join(data_dir, phase + '.pkl'), 'rb') as f:
             self.indexes = pickle.load(f) 
+
+        with open("datasets/articles_processed.pkl", "rb") as f:
+            articles = pickle.load(f)
+
+        with open("datasets/customers_processed.pkl", "rb") as f:
+            customers = pickle.load(f)
+
+        self.articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
+        self.customers_dict = dict(zip(customers[:,0], customers[:, 1:-1]))
         # with open(os.path.join(data_dir, 'articles_processed.pkl'), 'rb') as f:
         #     self.articles = pickle.load(f) 
         # with open(os.path.join(data_dir, 'customers_processed.pkl'), 'rb') as f:
         #     self.customers = pickle.load(f) 
         
-        pass
+
 
     def __len__(self):
         return len(self.indexes)
@@ -43,6 +54,9 @@ class FashionDataset(Dataset):
         sequence_features = self.samples['sequence_features'][index]
         customer_features = self.samples['customer_features'][index]
         target = self.samples['target'][index]
+
+        sequence_features = [self.articles_dict[article] for article in self.samples['sequence']]
+        customer_features = self.customers_dict[random.samples['customer_id']]
 
         return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target}
 
@@ -146,13 +160,13 @@ class FashionDataset(Dataset):
     def create_dataset(self):
         with open("datasets/customer_sequences.pkl", "rb") as f:
             customer_sequences = pickle.load(f)
-        with open("datasets/articles_processed.pkl", "rb") as f:
-            articles = pickle.load(f)
-        with open("datasets/customers_processed.pkl", "rb") as f:
-            customers = pickle.load(f)
+        # with open("datasets/articles_processed.pkl", "rb") as f:
+        #     articles = pickle.load(f)
+        # with open("datasets/customers_processed.pkl", "rb") as f:
+        #     customers = pickle.load(f)
 
-        articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
-        customers_dict = dict(zip(customers[:,0], customers[:, 1:-1]))
+        # articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
+        # customers_dict = dict(zip(customers[:,0], customers[:, 1:-1]))
 
         samples = {}
         samples['customer_id'] = []
@@ -179,14 +193,14 @@ class FashionDataset(Dataset):
                     samples['customer_id'].append(customer_id)
                     samples['sequence'].append(purchased)
                     # sequence_features = [for article in ]
-                    samples['sequence_features'].append([articles_dict[article] for article in purchased])
-                    samples['customer_features'].append(customers_dict[customer_id])
+                    # samples['sequence_features'].append([articles_dict[article] for article in purchased])
+                    # samples['customer_features'].append(customers_dict[customer_id])
                     samples['target'].append(1)
                     # Negative sample
                     samples['customer_id'].append(customer_id)
                     samples['sequence'].append(purchased[:-1] + [unpurchased])
-                    samples['sequence_features'].append([articles_dict[article] for article in purchased])
-                    samples['customer_features'].append(customers_dict[customer_id])
+                    # samples['sequence_features'].append([articles_dict[article] for article in purchased])
+                    # samples['customer_features'].append(customers_dict[customer_id])
                     samples['target'].append(0)
 
         indexes = [i for i in range(len(samples['target']))]
