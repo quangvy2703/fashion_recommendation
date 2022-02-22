@@ -33,8 +33,6 @@ class Training:
         max_length = self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
-        loss = 0
-
         for ei in range(input_length):
             # print(transaction_tensor.size(), transaction_tensor[0][ei].size(), transaction_encoder_hidden.size())
             encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
@@ -45,7 +43,8 @@ class Training:
         print(customer_encoder_output.size(), transaction_encoder_outputs.size(), transaction_encoder_hidden.size())
         decoder_output, decoder_attention = decoder(
             customer_encoder_output, transaction_encoder_outputs, transaction_encoder_hidden)
-    
+
+        print(decoder_output.size(), target_tensor.size())
         loss = criterion(decoder_output, target_tensor)
 
         loss.backward()
@@ -76,8 +75,8 @@ class Training:
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
         valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False) 
         print(f"Loaded {len(train_dataset)}  train data and {len(valid_dataset)} valid data")
-        criterion = nn.NLLLoss()
-
+        # criterion = nn.NLLLoss()
+        criterion = nn.CrossEntropyLoss()
 
         for epoch in range(self.config['EPOCHS']):
             for i, data in enumerate(train_loader, 0):

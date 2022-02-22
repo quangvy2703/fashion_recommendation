@@ -100,7 +100,7 @@ class AttnDecoder(nn.Module):
         # output, hidden = self.gru(output, hidden)
         output = self.out(output)
         # print(output)
-        output = F.log_softmax(output, dim=1)
+        # output = F.log_softmax(output, dim=1)
         # print(output)
         return output, attn_weights
 
