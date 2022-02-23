@@ -76,19 +76,20 @@ class Training:
         print("Loading train data...")
         train_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'train')
         print("Loading valid data...")
-        # valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'valid')
+        valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'valid')
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
-        # valid_loader = DataLoader(valid_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=False) 
-        valid_dataset = [1, 2, 3]
+        valid_loader = DataLoader(valid_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=False) 
+        # valid_dataset = [1, 2, 3]
         print(f"Loaded {len(train_dataset)} train data and {len(valid_dataset)} valid data")
         # criterion = nn.NLLLoss()
         criterion = nn.CrossEntropyLoss()
         total_batches = len(train_dataset) // self.config['BATCH_SIZE']
         for epoch in range(self.config['EPOCHS']):    
-            start_1 = datetime.now()
+            start = datetime.now()
             for i, data in enumerate(train_loader, 0):
-                print("Load data time ", datetime.now() - start_1)
-                start = datetime.now()
+                # print("Load data time ", 
+                # datetime.now() - start_1)
+                
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
                 target_tensor = data['target'].to(device)
@@ -100,14 +101,15 @@ class Training:
                             criterion, length)
                 print_loss_total += loss
                 plot_loss_total += loss
-                print("Runing time ", datetime.now() - start)
+                # print("Runing time ", datetime.now() - start)
                 if i % print_every == 0:
                     running_time = datetime.now() - start
+                    start = datetime.now()
                     print_loss_avg = print_loss_total / print_every
                     print_loss_total = 0
                     print(f'[{epoch + 1}, {i + 1:5d} / {total_batches} {running_time}] loss: {print_loss_avg:.3f}')
                     
-                start_1 = datetime.now()
+                # start_1 = datetime.now()
                 # if i % plot_every == 0:
                 #     plot_loss_avg = plot_loss_total / plot_every
                 #     plot_losses.append(plot_loss_avg)
@@ -118,7 +120,7 @@ class Training:
             torch.save(decoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'decoder_models', 'epoch_' + str(epoch) + '.pth'))
             
             # Evaluating
-            # self.run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, epoch)
+            self.run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, epoch)
 
         # showPlot(plot_losses)
 
