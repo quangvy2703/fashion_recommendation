@@ -9,12 +9,13 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class TransactionsEncoder(nn.Module):
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size, hidden_size, num_layers=1):
         super(TransactionsEncoder, self).__init__()
         self.hidden_size = hidden_size
+        self.num_layers = num_layers
 
         self.fc = nn.Linear(input_size, self.hidden_size)
-        self.gru = nn.GRU(self.hidden_size, self.hidden_size, batch_first=True)
+        self.gru = nn.GRU(self.hidden_size, self.hidden_size,  self.num_layers, batch_first=True)
 
     def forward(self, input, hidden):
         embedded = self.fc(input)
@@ -24,7 +25,7 @@ class TransactionsEncoder(nn.Module):
         return output, hidden
 
     def initHidden(self, batch_size):
-        return torch.zeros(batch_size, 1, self.hidden_size, device=device)
+        return torch.zeros( self.num_layers, batch_size, self.hidden_size, device=device)
 
 class CustomerEncoder(nn.Module):
     def __init__(self, input_size, hidden_size):

@@ -29,15 +29,17 @@ class Training:
         customer_encoder_optimizer.zero_grad()
         decoder_optimizer.zero_grad()
 
-        input_length = transaction_tensor.size(1)
+        # input_length = transaction_tensor.size(1)
         # input_length = length[0].item()
-        max_length = self.config['MAX_SEQUENCE_LENGTH']
-        transaction_encoder_outputs = torch.zeros(transaction_tensor.size(0), max_length, transaction_encoder.hidden_size, device=device)
+        # max_length = self.config['MAX_SEQUENCE_LENGTH']
+        # transaction_encoder_outputs = torch.zeros(transaction_tensor.size(0), max_length, transaction_encoder.hidden_size, device=device)
         # print(input_length)
-        for ei in range(input_length):
-            print(transaction_tensor.size(), transaction_encoder_hidden.size())
-            encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[:, ei, :], transaction_encoder_hidden)
-            transaction_encoder_outputs[:, ei, :] = encoder_output[:, 0, 0]
+        # for ei in range(input_length):
+        #     print(transaction_tensor.size(), transaction_encoder_hidden.size())
+        #     encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[:, ei, :], transaction_encoder_hidden)
+        #     transaction_encoder_outputs[:, ei, :] = encoder_output[:, 0, 0]
+
+        transaction_encoder_outputs, transaction_encoder_hidden = transaction_encoder(transaction_tensor, transaction_encoder_hidden)
 
         customer_encoder_output = customer_encoder(customer_tensor)
 
