@@ -23,13 +23,14 @@ class Training:
     def train(self, transaction_tensor, customer_tensor, target_tensor, \
                 transaction_encoder, customer_encoder, decoder,\
                 transaction_encoder_optimizer, customer_encoder_optimizer, decoder_optimizer, \
-                criterion):
+                criterion, length):
         transaction_encoder_hidden = transaction_encoder.initHidden()
         transaction_encoder_optimizer.zero_grad()
         customer_encoder_optimizer.zero_grad()
         decoder_optimizer.zero_grad()
 
-        input_length = transaction_tensor.size(1)
+        # input_length = transaction_tensor.size(1)
+        input_length = length
         max_length = self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
@@ -85,11 +86,12 @@ class Training:
                 sequence_tensor = data['sequence_features']
                 customer_tensor = data['customer_features']
                 target_tensor = data['target']
+                length = data['lenth']
 
                 loss = self.train(sequence_tensor, customer_tensor, target_tensor, 
                             transaction_encoder, customer_encoder, decoder,
                             transaction_encoder_optimizer, customer_encoder_optimizer, decoder_optimizer,
-                            criterion)
+                            criterion, length)
                 print_loss_total += loss
                 plot_loss_total += loss
 
@@ -118,9 +120,10 @@ class Training:
                 sequence_tensor = data['sequence_features']
                 customer_tensor = data['customer_features']
                 target_tensor = data['target']
+                length = data['length']
 
                 predicted, loss = self.evaluate(sequence_tensor, customer_tensor, target_tensor,
-                                            transaction_encoder, customer_encoder, decoder, criterion)
+                                            transaction_encoder, customer_encoder, decoder, criterion, length)
                 total_loss += loss
                 total += target_tensor.size(0)
                 correct += (predicted == target_tensor).sum().item()
@@ -130,9 +133,10 @@ class Training:
 
     def evaluate(self, transaction_tensor, customer_tensor, target_tensor, \
                 transaction_encoder, customer_encoder, decoder,\
-                criterion):
+                criterion, length):
         transaction_encoder_hidden = transaction_encoder.initHidden()
-        input_length = transaction_tensor.size(0)
+        # input_length = transaction_tensor.size(0)
+        input_length = length
         max_length=self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
