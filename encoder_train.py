@@ -137,6 +137,7 @@ class Training:
                 total_loss += loss
                 total += target_tensor.size(0)
                 correct += (predicted == target_tensor).sum().item()
+                break
             accuracy = 100 * correct / total
             print(f'[{epoch + 1}] Loss: {loss:.3f} Accuracy: {accuracy:.3f}')
 
