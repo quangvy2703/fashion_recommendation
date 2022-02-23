@@ -83,9 +83,10 @@ class Training:
         # criterion = nn.NLLLoss()
         criterion = nn.CrossEntropyLoss()
         total_batches = len(train_dataset) // self.config['BATCH_SIZE']
-        for epoch in range(self.config['EPOCHS']):
-          
+        for epoch in range(self.config['EPOCHS']):    
             for i, data in enumerate(train_loader, 0):
+                if i < total_batches - 1:
+                    continue
                 start = datetime.now()
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
