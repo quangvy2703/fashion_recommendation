@@ -76,9 +76,10 @@ class Training:
         print("Loading train data...")
         train_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'train')
         print("Loading valid data...")
-        valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'valid')
+        # valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'valid')
         train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
-        valid_loader = DataLoader(valid_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=False) 
+        # valid_loader = DataLoader(valid_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=False) 
+        valid_dataset = [1, 2, 3]
         print(f"Loaded {len(train_dataset)} train data and {len(valid_dataset)} valid data")
         # criterion = nn.NLLLoss()
         criterion = nn.CrossEntropyLoss()
@@ -117,7 +118,7 @@ class Training:
             torch.save(decoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'decoder_models', 'epoch_' + str(epoch) + '.pth'))
             
             # Evaluating
-            self.run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, epoch)
+            # self.run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, epoch)
 
         # showPlot(plot_losses)
 
