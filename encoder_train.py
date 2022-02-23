@@ -24,7 +24,7 @@ class Training:
                 transaction_encoder, customer_encoder, decoder,\
                 transaction_encoder_optimizer, customer_encoder_optimizer, decoder_optimizer, \
                 criterion, length):
-        transaction_encoder_hidden = transaction_encoder.initHidden()
+        transaction_encoder_hidden = transaction_encoder.initHidden(self.config['BATCH_SIZE'])
         transaction_encoder_optimizer.zero_grad()
         customer_encoder_optimizer.zero_grad()
         decoder_optimizer.zero_grad()
