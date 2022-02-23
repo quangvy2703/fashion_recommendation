@@ -43,7 +43,7 @@ class Training:
 
         customer_encoder_output = customer_encoder(customer_tensor)
 
-        print(customer_encoder_output.size(), transaction_encoder_outputs.size(), transaction_encoder_hidden.size())
+        # print(customer_encoder_output.size(), transaction_encoder_outputs.size(), transaction_encoder_hidden.size())
         decoder_output, decoder_attention = decoder(
             customer_encoder_output, transaction_encoder_outputs, transaction_encoder_hidden)
 
@@ -82,7 +82,7 @@ class Training:
         print(f"Loaded {len(train_dataset)}  train data and {len(valid_dataset)} valid data")
         # criterion = nn.NLLLoss()
         criterion = nn.CrossEntropyLoss()
-
+        total_batches = len(train_dataset) // self.config['BATCH_SIZE']
         for epoch in range(self.config['EPOCHS']):
             for i, data in enumerate(train_loader, 0):
                 sequence_tensor = data['sequence_features']
@@ -100,7 +100,7 @@ class Training:
                 if i % print_every == 0:
                     print_loss_avg = print_loss_total / print_every
                     print_loss_total = 0
-                    print(f'[{epoch + 1}, {i + 1:5d}] loss: {print_loss_avg:.3f}')
+                    print(f'[{epoch + 1}, {i + 1:5d} / {total_batches}] loss: {print_loss_avg:.3f}')
 
                 # if i % plot_every == 0:
                 #     plot_loss_avg = plot_loss_total / plot_every

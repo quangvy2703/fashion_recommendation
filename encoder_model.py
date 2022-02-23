@@ -96,9 +96,9 @@ class AttnDecoder(nn.Module):
         attn_applied = torch.bmm(attn_weights.unsqueeze(1),
                                 transaction_encoder_outputs)
 
-        print(customer_encoder_output.size(), attn_applied.size())
+        # print(customer_encoder_output.size(), attn_applied.size())
         output = torch.cat((customer_encoder_output, attn_applied.squeeze(1)), 1)
-        print(output.size())
+        # print(output.size())
         output = self.attn_combine(output).unsqueeze(0)
 
         output = F.relu(output)
