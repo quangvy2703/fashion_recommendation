@@ -65,7 +65,7 @@ class FashionDataset(Dataset):
         sequence_features = torch.tensor(sequence_features, dtype=torch.float, device=device)
         customer_features = torch.tensor(customer_features, dtype=torch.float, device=device)
         target = torch.tensor(int(target), dtype=torch.long, device=device)
-        return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target, 'length': len(sequence_features)}
+        return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target, 'length': len(self.samples['sequence'][index])}
 
 
 
