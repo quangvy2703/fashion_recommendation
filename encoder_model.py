@@ -90,11 +90,11 @@ class AttnDecoder(nn.Module):
         print(customer_encoder_output.size(),  transaction_encoder_outputs.size(), hidden.size())
         attn_weights = F.softmax(
             self.attn(torch.cat((customer_encoder_output, hidden[0]), 1)), dim=1)
-        #att_weights [batch_size x hidden]
+        #att_weights [batch_size x len_seq]
         #encoder_output [batch_size x len_seq x hidden]
-        print(attn_weights.size(), attn_weights.unsqueeze(2).size(), transaction_encoder_outputs.size())
-        attn_applied = torch.bmm(transaction_encoder_outputs,
-                                attn_weights.unsqueeze(2))
+        print(attn_weights.size(), attn_weights.unsqueeze(1).size(), transaction_encoder_outputs.size())
+        attn_applied = torch.bmm(attn_weights.unsqueeze(1),
+                                transaction_encoder_outputs)
 
         # print(customer_encoder_output.size(), attn_applied.size())
         output = torch.cat((customer_encoder_output, attn_applied[0]), 1)
