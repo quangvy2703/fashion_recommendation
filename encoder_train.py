@@ -35,7 +35,7 @@ class Training:
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
         print(input_length)
         for ei in range(input_length):
-            # print(transaction_tensor.size(), transaction_tensor[0][ei].size(), transaction_encoder_hidden.size())
+            print(transaction_tensor.size(), customer_tensor.size())
             encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
             transaction_encoder_outputs[ei] = encoder_output[0, 0]
 
