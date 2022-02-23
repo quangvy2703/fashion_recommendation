@@ -86,7 +86,7 @@ class Training:
                 sequence_tensor = data['sequence_features']
                 customer_tensor = data['customer_features']
                 target_tensor = data['target']
-                length = data['lenth']
+                length = data['length']
 
                 loss = self.train(sequence_tensor, customer_tensor, target_tensor, 
                             transaction_encoder, customer_encoder, decoder,
