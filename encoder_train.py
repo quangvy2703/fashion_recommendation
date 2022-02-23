@@ -104,6 +104,7 @@ class Training:
                     print_loss_avg = print_loss_total / print_every
                     print_loss_total = 0
                     print(f'[{epoch + 1}, {i + 1:5d} / {total_batches} {running_time}] loss: {print_loss_avg:.3f}')
+                    break
 
                 # if i % plot_every == 0:
                 #     plot_loss_avg = plot_loss_total / plot_every
