@@ -12,7 +12,7 @@ import pickle
 import time
 import math
 import random
-
+from datetime import datetime
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Training:
@@ -84,7 +84,9 @@ class Training:
         criterion = nn.CrossEntropyLoss()
         total_batches = len(train_dataset) // self.config['BATCH_SIZE']
         for epoch in range(self.config['EPOCHS']):
+          
             for i, data in enumerate(train_loader, 0):
+                start = datetime.now()
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
                 target_tensor = data['target'].to(device)
@@ -98,15 +100,21 @@ class Training:
                 plot_loss_total += loss
 
                 if i % print_every == 0:
+                    running_time = datetime.now() - start
                     print_loss_avg = print_loss_total / print_every
                     print_loss_total = 0
-                    print(f'[{epoch + 1}, {i + 1:5d} / {total_batches}] loss: {print_loss_avg:.3f}')
+                    print(f'[{epoch + 1}, {i + 1:5d} / {total_batches} {running_time}] loss: {print_loss_avg:.3f}')
+                    break
 
                 # if i % plot_every == 0:
                 #     plot_loss_avg = plot_loss_total / plot_every
                 #     plot_losses.append(plot_loss_avg)
                 #     plot_loss_total = 0
-                
+              
+            torch.save(transaction_encoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'transaction_models', 'epoch_' + str(epoch) + '.pth'))
+            torch.save(customer_encoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'customer_models', 'epoch_' + str(epoch) + '.pth'))
+            torch.save(decoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'decoder_models', 'epoch_' + str(epoch) + '.pth'))
+            
             # Evaluating
             self.run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, epoch)
 
