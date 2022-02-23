@@ -18,7 +18,7 @@ class TransactionsEncoder(nn.Module):
 
     def forward(self, input, hidden):
         embedded = self.fc(input)
-        output = embedded.unsqueeze(1)
+        output = embedded.unsqueeze(0)
         print(output.size(), hidden.size())
         output, hidden = self.gru(output, hidden)
         return output, hidden
