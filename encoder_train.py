@@ -30,10 +30,10 @@ class Training:
         decoder_optimizer.zero_grad()
 
         # input_length = transaction_tensor.size(1)
-        input_length = length
+        input_length = length.item()
         max_length = self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
-
+        # print(input_length)
         for ei in range(input_length):
             # print(transaction_tensor.size(), transaction_tensor[0][ei].size(), transaction_encoder_hidden.size())
             encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
@@ -136,7 +136,7 @@ class Training:
                 criterion, length):
         transaction_encoder_hidden = transaction_encoder.initHidden()
         # input_length = transaction_tensor.size(0)
-        input_length = length
+        input_length = length.item()
         max_length=self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
