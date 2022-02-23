@@ -24,7 +24,7 @@ class Training:
                 transaction_encoder, customer_encoder, decoder,\
                 transaction_encoder_optimizer, customer_encoder_optimizer, decoder_optimizer, \
                 criterion, length):
-        transaction_encoder_hidden = transaction_encoder.initHidden(self.config['BATCH_SIZE'])
+        transaction_encoder_hidden = transaction_encoder.initHidden(self.config['BATCH_SIZE']).to(device)
         transaction_encoder_optimizer.zero_grad()
         customer_encoder_optimizer.zero_grad()
         decoder_optimizer.zero_grad()
@@ -85,9 +85,9 @@ class Training:
         total_batches = len(train_dataset) // self.config['BATCH_SIZE']
         for epoch in range(self.config['EPOCHS']):
             for i, data in enumerate(train_loader, 0):
-                sequence_tensor = data['sequence_features']
-                customer_tensor = data['customer_features']
-                target_tensor = data['target']
+                sequence_tensor = data['sequence_features'].to(device)
+                customer_tensor = data['customer_features'].to(device)
+                target_tensor = data['target'].to(device)
                 length = data['length']
                 
                 loss = self.train(sequence_tensor, customer_tensor, target_tensor, 
@@ -119,9 +119,9 @@ class Training:
             total = 0
             correct = 0
             for i, data in enumerate(valid_loader):
-                sequence_tensor = data['sequence_features']
-                customer_tensor = data['customer_features']
-                target_tensor = data['target']
+                sequence_tensor = data['sequence_features'].to(device)
+                customer_tensor = data['customer_features'].to(device)
+                target_tensor = data['target'].to(device)
                 length = data['length']
 
                 predicted, loss = self.evaluate(sequence_tensor, customer_tensor, target_tensor,
@@ -136,16 +136,17 @@ class Training:
     def evaluate(self, transaction_tensor, customer_tensor, target_tensor, \
                 transaction_encoder, customer_encoder, decoder,\
                 criterion, length):
-        transaction_encoder_hidden = transaction_encoder.initHidden()
+        transaction_encoder_hidden = transaction_encoder.initHidden(self.config['BATCH_SIZE']).to(device)
         # input_length = transaction_tensor.size(0)
         input_length = length[0].item()
         max_length=self.config['MAX_SEQUENCE_LENGTH']
         transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
 
 
-        for ei in range(input_length):
-            encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
-            transaction_encoder_outputs[ei] = encoder_output[0, 0]
+        # for ei in range(input_length):
+        #     encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
+        #     transaction_encoder_outputs[ei] = encoder_output[0, 0]
+        transaction_encoder_outputs, transaction_encoder_hidden = transaction_encoder(transaction_tensor, transaction_encoder_hidden)
 
         customer_encoder_output = customer_encoder(customer_tensor)
 
