@@ -19,12 +19,12 @@ class TransactionsEncoder(nn.Module):
     def forward(self, input, hidden):
         embedded = self.fc(input)
         output = embedded
-        # print(output.size())
+        print(output.size(), hidden.size())
         output, hidden = self.gru(output, hidden)
         return output, hidden
 
-    def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+    def initHidden(self, batch_size):
+        return torch.zeros(batch_size, 1, self.hidden_size, device=device)
 
 class CustomerEncoder(nn.Module):
     def __init__(self, input_size, hidden_size):
