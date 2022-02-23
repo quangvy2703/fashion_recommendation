@@ -109,7 +109,11 @@ class Training:
                 #     plot_loss_avg = plot_loss_total / plot_every
                 #     plot_losses.append(plot_loss_avg)
                 #     plot_loss_total = 0
-                
+              
+            torch.save(transaction_encoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'transaction_models', 'epoch_' + str(epoch) + '.pth'))
+            torch.save(customer_encoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'customer_models', 'epoch_' + str(epoch) + '.pth'))
+            torch.save(decoder.state_dict(), os.path.join(self.config['MODELS_PATH'], 'decoder_models', 'epoch_' + str(epoch) + '.pth'))
+            
             # Evaluating
             self.run_evaluate(transaction_encoder, customer_encoder, decoder, valid_loader, epoch)
 
