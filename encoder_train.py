@@ -29,19 +29,19 @@ class Training:
         customer_encoder_optimizer.zero_grad()
         decoder_optimizer.zero_grad()
 
-        # input_length = transaction_tensor.size(1)
-        input_length = length[0].item()
+        input_length = transaction_tensor.size(1)
+        # input_length = length[0].item()
         max_length = self.config['MAX_SEQUENCE_LENGTH']
-        transaction_encoder_outputs = torch.zeros(max_length, transaction_encoder.hidden_size, device=device)
-        print(input_length)
+        transaction_encoder_outputs = torch.zeros(transaction_tensor.size(0), max_length, transaction_encoder.hidden_size, device=device)
+        # print(input_length)
         for ei in range(input_length):
-            print(transaction_tensor.size(), customer_tensor.size())
-            encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[0][ei], transaction_encoder_hidden)
-            transaction_encoder_outputs[ei] = encoder_output[0, 0]
+            # print(transaction_tensor.size(), customer_tensor.size())
+            encoder_output, transaction_encoder_hidden = transaction_encoder(transaction_tensor[:, ei, :], transaction_encoder_hidden)
+            transaction_encoder_outputs[:, ei, :] = encoder_output[:, 0, 0]
 
         customer_encoder_output = customer_encoder(customer_tensor)
 
-        # print(customer_encoder_output.size(), transaction_encoder_outputs.size(), transaction_encoder_hidden.size())
+        print(customer_encoder_output.size(), transaction_encoder_outputs.size(), transaction_encoder_hidden.size())
         decoder_output, decoder_attention = decoder(
             customer_encoder_output, transaction_encoder_outputs, transaction_encoder_hidden)
 

@@ -104,5 +104,5 @@ class AttnDecoder(nn.Module):
         # print(output)
         return output[0], attn_weights
 
-    def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+    def initHidden(self, batch_size):
+        return torch.zeros(batch_size, 1, self.hidden_size, device=device)
