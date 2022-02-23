@@ -84,9 +84,9 @@ class Training:
         criterion = nn.CrossEntropyLoss()
         total_batches = len(train_dataset) // self.config['BATCH_SIZE']
         for epoch in range(self.config['EPOCHS']):    
+            start_1 = datetime.now()
             for i, data in enumerate(train_loader, 0):
-                if i < total_batches - 1:
-                    continue
+                print("Load data time ", datetime.now() - start_1)
                 start = datetime.now()
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
@@ -99,7 +99,7 @@ class Training:
                             criterion, length)
                 print_loss_total += loss
                 plot_loss_total += loss
-
+                print("Runing time ", datetime.now() - start)
                 if i % print_every == 0:
                     running_time = datetime.now() - start
                     print_loss_avg = print_loss_total / print_every
