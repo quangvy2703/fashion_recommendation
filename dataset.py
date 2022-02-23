@@ -61,9 +61,9 @@ class FashionDataset(Dataset):
         target = self.samples['target'][index]
 
         sequence_features = [self.articles_dict[article] for article in self.samples['sequence'][index]]
-        zeros_features = self.config['TRANSACTION_ENCODER_INPUT_SIZE'] * [0]
         if len(sequence_features) < self.config['MAX_SEQUENCE_LENGTH']:
-             sequence_features = sequence_features + [zeros_features] * (self.config['MAX_SEQUENCE_LENGTH'] - len(sequence_features))
+            zeros_features = self.config['TRANSACTION_ENCODER_INPUT_SIZE'] * [0]
+            sequence_features = sequence_features + [zeros_features] * (self.config['MAX_SEQUENCE_LENGTH'] - len(sequence_features))
 
         customer_features = self.customers_dict[self.samples['customer_id'][index]]
         sequence_features = torch.tensor(sequence_features, dtype=torch.float, device=device)
