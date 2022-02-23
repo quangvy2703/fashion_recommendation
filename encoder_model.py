@@ -17,7 +17,7 @@ class TransactionsEncoder(nn.Module):
         self.gru = nn.GRU(self.hidden_size, self.hidden_size, batch_first=True)
 
     def forward(self, input, hidden):
-        embedded = self.fc(input).view(1, 1, -1)
+        embedded = self.fc(input)
         output = embedded
         # print(output.size())
         output, hidden = self.gru(output, hidden)
