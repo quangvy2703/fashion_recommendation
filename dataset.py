@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn_pandas import DataFrameMapper
 from torch.utils.data import Dataset
 import torch
+from datetime import datetime
 
 from config import *
 
@@ -52,7 +53,8 @@ class FashionDataset(Dataset):
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.to_list()
-
+        
+        start = datetime.now()
         index = self.indexes[idx]
         # customer_id = self.samples['customer_id'][index]
         # sequence_features = self.samples['sequence_features'][index]
@@ -68,6 +70,7 @@ class FashionDataset(Dataset):
         sequence_features = torch.tensor(sequence_features, dtype=torch.float, device=device)
         customer_features = torch.tensor(customer_features, dtype=torch.float, device=device)
         target = torch.tensor(int(target), dtype=torch.long, device=device)
+        print("Load data time inplace ", datetime.now() - start)
         return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target, 'length': len(self.samples['sequence'][index])}
 
 
