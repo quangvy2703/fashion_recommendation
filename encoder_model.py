@@ -92,6 +92,7 @@ class AttnDecoder(nn.Module):
             self.attn(torch.cat((customer_encoder_output, hidden[0]), 1)), dim=1)
         #att_weights [batch_size x hidden]
         #encoder_output [batch_size x len_seq x hidden]
+        print(attn_weights.size(), attn_weights.unsqueeze(2).size(), transaction_encoder_outputs.size())
         attn_applied = torch.bmm(transaction_encoder_outputs,
                                 attn_weights.unsqueeze(2))
 
