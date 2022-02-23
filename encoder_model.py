@@ -20,7 +20,7 @@ class TransactionsEncoder(nn.Module):
     def forward(self, input, hidden):
         output = self.fc(input)
         # output = output.unsqueeze(0)
-        print(output.size(), hidden.size())
+        # print(output.size(), hidden.size())
         output, hidden = self.gru(output, hidden)
         return output, hidden
 
