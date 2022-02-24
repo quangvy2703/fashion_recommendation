@@ -19,6 +19,7 @@ def parse_args():
     parser.add_argument('--hidden', type=int, default=1024)
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--lr', type=float, default=0.1)
+    parser.add_argument('--n_layers', type=int, default=1)
     parser.add_argument('--seed', type=int, default=1204, help='random seed')
     args = parser.parse_args()
     return args
@@ -90,6 +91,7 @@ if __name__ == '__main__':
     cfg['EPOCHS'] = args.epochs
     cfg['HIDDEN_SIZE'] = args.hidden
     cfg['BATCH_SIZE'] = args.batch_size
+    cfg['N_LAYERS'] = args.n_layers
     cfg['LR'] = args.lr
 
     

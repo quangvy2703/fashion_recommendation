@@ -16,7 +16,7 @@ cfg["TRANSACTION_ENCODER_INPUT_SIZE"] = 632
 cfg["CUSTOMER_ENCODER_INPUT_SIZE"] = 11
 cfg["HIDDEN_SIZE"] = 1024
 cfg["N_CLASSES"] = 2
-
+cfg["N_LAYERS"] = 2
 cfg["LR"] = 0.01
 cfg['MODELS_PATH'] = "saved_models"
 MAX_SEQUENCE_LENGTH = 10
