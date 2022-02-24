@@ -92,9 +92,9 @@ class Training:
                 # print("Load data time ", 
                 # datetime.now() - start_1)
                 # start_2 = datetime.now()
-                sequence_tensor = data['sequence_features'].to(device)
-                customer_tensor = data['customer_features'].to(device)
-                target_tensor = data['target'].to(device)
+                sequence_tensor = data['sequence_features']
+                customer_tensor = data['customer_features']
+                target_tensor = data['target']
 
                 sequence_tensor = torch.tensor(sequence_tensor, dtype=torch.float, device=device)
                 customer_tensor = torch.tensor(customer_tensor, dtype=torch.float, device=device)
@@ -137,9 +137,9 @@ class Training:
             total = 0
             correct = 0
             for i, data in tqdm(enumerate(valid_loader)):
-                sequence_tensor = data['sequence_features'].to(device)
-                customer_tensor = data['customer_features'].to(device)
-                target_tensor = data['target'].to(device)
+                sequence_tensor = data['sequence_features']
+                customer_tensor = data['customer_features']
+                target_tensor = data['target']
                 
                 sequence_tensor = torch.tensor(sequence_tensor, dtype=torch.float, device=device)
                 customer_tensor = torch.tensor(customer_tensor, dtype=torch.float, device=device)
