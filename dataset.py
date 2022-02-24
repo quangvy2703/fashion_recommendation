@@ -57,7 +57,7 @@ class FashionDataset(Dataset):
         # customer_id = self.samples['customer_id'][index]
         # sequence_features = self.samples['sequence_features'][index]
         # customer_features = self.samples['customer_features'][index]
-        target = self.samples['target'][index]
+        target = int(self.samples['target'][index])
 
         # sequence_features = [self.articles_dict[article] for article in self.samples['sequence'][index]]
         sequence_features = self.samples['sequence_features'][index]
@@ -69,9 +69,9 @@ class FashionDataset(Dataset):
         # customer_features = self.customers_dict[self.samples['customer_id'][index]]
         customer_features = np.array(self.samples['customer_features'][index], dtype=np.float)
         # print(customer_features)
-        sequence_features = torch.tensor(sequence_features, dtype=torch.float, device=device)
-        customer_features = torch.tensor(customer_features, dtype=torch.float, device=device)
-        target = torch.tensor(int(target), dtype=torch.long, device=device)
+        # sequence_features = torch.tensor(sequence_features, dtype=torch.float, device=device)
+        # customer_features = torch.tensor(customer_features, dtype=torch.float, device=device)
+        # target = torch.tensor(int(target), dtype=torch.long, device=device)
         return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target, 'length': _len}
 
 
