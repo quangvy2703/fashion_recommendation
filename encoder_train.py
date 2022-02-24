@@ -177,5 +177,5 @@ class Training:
         transaction_encoder = TransactionsEncoder(self.config['TRANSACTION_ENCODER_INPUT_SIZE'], self.config['HIDDEN_SIZE']).to(device)
         customer_encoder = CustomerEncoder(self.config['CUSTOMER_ENCODER_INPUT_SIZE'], self.config['HIDDEN_SIZE']).to(device)
         attn_decoder = AttnDecoder(self.config['HIDDEN_SIZE'], self.config['N_CLASSES'], dropout_p=0.1).to(device)
-        self.run_epochs(transaction_encoder, customer_encoder, attn_decoder, 1000, learning_rate=self.config['LR'])
+        self.run_epochs(transaction_encoder, customer_encoder, attn_decoder, 100, learning_rate=self.config['LR'])
 
