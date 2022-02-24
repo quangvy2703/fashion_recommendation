@@ -60,7 +60,7 @@ class FashionDataset(Dataset):
         target = self.samples['target'][index]
 
         # sequence_features = [self.articles_dict[article] for article in self.samples['sequence'][index]]
-        sequence_features = self.samples['sequence_features']['index']
+        sequence_features = self.samples['sequence_features'][index]
         _len = len(sequence_features)
         if _len < self.config['MAX_SEQUENCE_LENGTH']:
             zeros_features = self.config['TRANSACTION_ENCODER_INPUT_SIZE'] * [0]
