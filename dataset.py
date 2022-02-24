@@ -23,8 +23,7 @@ class FashionDataset(Dataset):
         self.phase = phase
         self.config = config
         self.samples = all_samples
-        # with open(os.path.join(data_dir, 'all_samples.pkl'), 'rb') as f:
-        #     self.samples = pickle.load(f)
+ 
         
         with open(os.path.join(data_dir, phase + '_indexes.pkl'), 'rb') as f:
             self.indexes = pickle.load(f)
@@ -32,14 +31,14 @@ class FashionDataset(Dataset):
             self.indexes = set(self.indexes) - set(random.choices(self.indexes, k=n_remove))
             self.indexes = list(self.indexes) 
 
-        with open(os.path.join(self.data_dir, "articles_processed.pkl"), "rb") as f:
-            articles = pickle.load(f)
+        # with open(os.path.join(self.data_dir, "articles_processed.pkl"), "rb") as f:
+        #     articles = pickle.load(f)
 
-        with open(os.path.join(self.data_dir, "customers_processed.pkl"), "rb") as f:
-            customers = pickle.load(f)
+        # with open(os.path.join(self.data_dir, "customers_processed.pkl"), "rb") as f:
+        #     customers = pickle.load(f)
 
-        self.articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
-        self.customers_dict = dict(zip(customers[:,0], np.array(customers[:, 1:-1], dtype=np.float32)))
+        # self.articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
+        # self.customers_dict = dict(zip(customers[:,0], np.array(customers[:, 1:-1], dtype=np.float32)))
         # with open(os.path.join(data_dir, 'articles_processed.pkl'), 'rb') as f:
         #     self.articles = pickle.load(f) 
         # with open(os.path.join(data_dir, 'customers_processed.pkl'), 'rb') as f:
@@ -60,16 +59,19 @@ class FashionDataset(Dataset):
         # customer_features = self.samples['customer_features'][index]
         target = self.samples['target'][index]
 
-        sequence_features = [self.articles_dict[article] for article in self.samples['sequence'][index]]
-        if len(sequence_features) < self.config['MAX_SEQUENCE_LENGTH']:
+        # sequence_features = [self.articles_dict[article] for article in self.samples['sequence'][index]]
+        sequence_features = self.samples['sequence_features']['index']
+        _len = len(sequence_features)
+        if _len < self.config['MAX_SEQUENCE_LENGTH']:
             zeros_features = self.config['TRANSACTION_ENCODER_INPUT_SIZE'] * [0]
-            sequence_features = sequence_features + [zeros_features] * (self.config['MAX_SEQUENCE_LENGTH'] - len(sequence_features))
+            sequence_features = sequence_features + [zeros_features] * (self.config['MAX_SEQUENCE_LENGTH'] - _len)
 
-        customer_features = self.customers_dict[self.samples['customer_id'][index]]
+        # customer_features = self.customers_dict[self.samples['customer_id'][index]]
+        customer_features = self.samples['customer_features'][index]
         sequence_features = torch.tensor(sequence_features, dtype=torch.float, device=device)
         customer_features = torch.tensor(customer_features, dtype=torch.float, device=device)
         target = torch.tensor(int(target), dtype=torch.long, device=device)
-        return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target, 'length': len(self.samples['sequence'][index])}
+        return {'sequence_features': sequence_features, 'customer_features': customer_features, 'target': target, 'length': _len}
 
 
 
