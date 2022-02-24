@@ -28,7 +28,7 @@ class FashionDataset(Dataset):
         with open(os.path.join(data_dir, phase + '_indexes.pkl'), 'rb') as f:
             self.indexes = pickle.load(f)
             n_remove = len(self.indexes) % self.config['BATCH_SIZE']
-            self.indexes = set(self.indexes) - set(random.choices(self.indexes, k=n_remove))
+            self.indexes = set(self.indexes) - set(random.sample(self.indexes, k=n_remove))
             self.indexes = list(self.indexes) 
 
         # with open(os.path.join(self.data_dir, "articles_processed.pkl"), "rb") as f:
