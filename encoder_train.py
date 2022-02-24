@@ -95,8 +95,9 @@ class Training:
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
                 target_tensor = data['target'].to(device)
+
                 sequence_tensor = torch.tensor(sequence_tensor, dtype=torch.float, device=device)
-                variable = torch.tensor(variable, dtype=torch.float, device=device)
+                customer_tensor = torch.tensor(customer_tensor, dtype=torch.float, device=device)
                 target_tensor = torch.tensor(target_tensor, dtype=torch.long, device=device)
                 length = data['length']
                 
@@ -139,8 +140,9 @@ class Training:
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
                 target_tensor = data['target'].to(device)
+                
                 sequence_tensor = torch.tensor(sequence_tensor, dtype=torch.float, device=device)
-                variable = torch.tensor(variable, dtype=torch.float, device=device)
+                customer_tensor = torch.tensor(customer_tensor, dtype=torch.float, device=device)
                 target_tensor = torch.tensor(target_tensor, dtype=torch.long, device=device)
 
                 length = data['length']
