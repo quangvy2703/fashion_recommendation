@@ -63,7 +63,7 @@ class Training:
 
 
     def run_epochs(self, transaction_encoder, customer_encoder, decoder, print_every=1000, learning_rate=0.01):
-        start = time.time()
+        # start = time.time()
         plot_losses = []
         print_loss_total = 0  # Reset every print_every
         plot_loss_total = 0  # Reset every plot_every
@@ -86,6 +86,7 @@ class Training:
         total_batches = len(train_dataset) // self.config['BATCH_SIZE']
         for epoch in range(self.config['EPOCHS']):    
             start_1 = datetime.now()
+            start = datetime.now()
             for i, data in enumerate(train_loader, 0):
                 print("Load data time ", 
                 datetime.now() - start_1)
