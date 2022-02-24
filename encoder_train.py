@@ -78,8 +78,8 @@ class Training:
         train_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'train')
         print("Loading valid data...")
         valid_dataset = FashionDataset(self.config, self.config['DATA_DIR'], samples, 'valid')
-        train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True)
-        valid_loader = DataLoader(valid_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=False) 
+        train_loader = DataLoader(train_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=True, num_workers=2)
+        valid_loader = DataLoader(valid_dataset, batch_size=self.config['BATCH_SIZE'], shuffle=False, num_workers=2) 
         # valid_dataset = [1, 2, 3]
         print(f"Loaded {len(train_dataset)} train data and {len(valid_dataset)} valid data")
         # criterion = nn.NLLLoss()
@@ -132,7 +132,7 @@ class Training:
             total_loss = 0
             total = 0
             correct = 0
-            for i, data in enumerate(valid_loader):
+            for i, data in tqdm(enumerate(valid_loader)):
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
                 target_tensor = data['target'].to(device)
