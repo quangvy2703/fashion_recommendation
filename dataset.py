@@ -67,7 +67,7 @@ class FashionDataset(Dataset):
             sequence_features = sequence_features + [zeros_features] * (self.config['MAX_SEQUENCE_LENGTH'] - _len)
 
         # customer_features = self.customers_dict[self.samples['customer_id'][index]]
-        customer_features = np.array(self.samples['customer_features'][index][1:-1], dtype=np.float)
+        customer_features = np.array(self.samples['customer_features'][index], dtype=np.float)
         print(customer_features)
         sequence_features = torch.tensor(sequence_features, dtype=torch.float, device=device)
         customer_features = torch.tensor(customer_features, dtype=torch.float, device=device)
