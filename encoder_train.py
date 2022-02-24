@@ -96,9 +96,9 @@ class Training:
                 customer_tensor = data['customer_features']
                 target_tensor = data['target']
 
-                sequence_tensor = torch.tensor(sequence_tensor, dtype=torch.float, device=device)
-                customer_tensor = torch.tensor(customer_tensor, dtype=torch.float, device=device)
-                target_tensor = torch.tensor(target_tensor, dtype=torch.long, device=device)
+                sequence_tensor = sequence_tensor.float().to(device)
+                customer_tensor = customer_tensor.float().to(device)
+                target_tensor = target_tensor.long().to(device)
                 length = data['length']
                 
                 loss = self.train(sequence_tensor, customer_tensor, target_tensor, 
@@ -141,9 +141,9 @@ class Training:
                 customer_tensor = data['customer_features']
                 target_tensor = data['target']
                 
-                sequence_tensor = torch.tensor(sequence_tensor, dtype=torch.float, device=device)
-                customer_tensor = torch.tensor(customer_tensor, dtype=torch.float, device=device)
-                target_tensor = torch.tensor(target_tensor, dtype=torch.long, device=device)
+                sequence_tensor = sequence_tensor.float().to(device)
+                customer_tensor = customer_tensor.float().to(device)
+                target_tensor = target_tensor.long().to(device)
 
                 length = data['length']
 
