@@ -1,4 +1,5 @@
 from sklearn.utils import shuffle
+from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torch import optim
@@ -85,12 +86,12 @@ class Training:
         criterion = nn.CrossEntropyLoss()
         total_batches = len(train_dataset) // self.config['BATCH_SIZE']
         for epoch in range(self.config['EPOCHS']):    
-            start_1 = datetime.now()
+            # start_1 = datetime.now()
             start = datetime.now()
-            for i, data in enumerate(train_loader, 0):
-                print("Load data time ", 
-                datetime.now() - start_1)
-                start_2 = datetime.now()
+            for i, data in tqdm(enumerate(train_loader, 0)):
+                # print("Load data time ", 
+                # datetime.now() - start_1)
+                # start_2 = datetime.now()
                 sequence_tensor = data['sequence_features'].to(device)
                 customer_tensor = data['customer_features'].to(device)
                 target_tensor = data['target'].to(device)
@@ -102,15 +103,15 @@ class Training:
                             criterion, length)
                 print_loss_total += loss
                 plot_loss_total += loss
-                print("Runing time ", datetime.now() - start_2)
-                if i % print_every == 0:
+                # print("Runing time ", datetime.now() - start_2)
+                if i % print_every == 0 and i > 0:
                     running_time = datetime.now() - start
                     start = datetime.now()
                     print_loss_avg = print_loss_total / print_every
                     print_loss_total = 0
                     print(f'[{epoch + 1}, {i + 1:5d} / {total_batches} {running_time}] loss: {print_loss_avg:.3f}')
                     
-                start_1 = datetime.now()
+                # start_1 = datetime.now()
                 # if i % plot_every == 0:
                 #     plot_loss_avg = plot_loss_total / plot_every
                 #     plot_losses.append(plot_loss_avg)
