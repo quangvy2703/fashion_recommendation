@@ -44,7 +44,7 @@ class Vocab:
         self.article2index = {v: k for k, v in self.index2article.items()}
 
     def index_articles(self, articles):
-        for article in articles:
+        for article in tqdm(articles, desc="Indexing articles..."):
             self.index_article(article)
 
     def index_article(self, article):
@@ -294,7 +294,6 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     vocab = Vocab()
     vocab.from_file(saved_data_dir + '/vocab.txt')
-    VOCAB_SIZE = len(vocab.article2index)
     print("Vocab size ", VOCAB_SIZE)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = vocab.article_features
