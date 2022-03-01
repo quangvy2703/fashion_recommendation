@@ -126,7 +126,7 @@ def indexes_from_transaction(vocab, transaction):
 def tensor_from_transaction(vocab, transaction, max_seq_length):
     indexes = indexes_from_transaction(vocab, transaction)
     if len(indexes) > max_seq_length - 2:
-        indexes = indexes[-(max_seq_length + 2):]
+        indexes = indexes[-(max_seq_length - 2):]
     indexes.append(EOS_idx)
     indexes.insert(0, SOS_idx)
     if len(indexes) < max_seq_length:
