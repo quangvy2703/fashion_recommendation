@@ -238,8 +238,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
         src = X_train[batch]
-        torch.save(src, 'src.bin')
-        src_features = [article_features[np.array(i, dtype=np.int32)] for i in src]
+        # torch.save(src, 'src.bin')
+        src_features = [article_features[i] for i in src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
@@ -302,8 +302,9 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
     print("Vocab size ", VOCAB_SIZE)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
-    article_features = vocab.article_features
-    torch.save(article_features, "article_features.bin")
+    article_features = np.array(vocab.article_features)
+
+    # torch.save(article_features, "article_features.bin")
     EMB_SIZE = 512
     NHEAD = 8
     FFN_HID_DIM = 512
