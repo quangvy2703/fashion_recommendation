@@ -186,12 +186,12 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     print('Corpus length: {}\nVocabulary size: {}'.format(
         len(source), len(vocab.article2index)))
 
-    X_train, X_valid, Y_train, Y_valid = train_test_split([customer_ids, source], target, test_size=0.2, random_state=42)
+    X_train, X_valid, Y_train, Y_valid = train_test_split(source, target, test_size=0.2, random_state=42)
 
-    customer_id_train = X_train[:, 1]
-    X_train = X_train[:, 0]
-    customer_id_valid = X_valid[:, 1]
-    X_valid = X_valid[:, 0]
+    # customer_id_train = X_train[:, 1]
+    # X_train = X_train[:, 0]
+    # customer_id_valid = X_valid[:, 1]
+    # X_valid = X_valid[:, 0]
 
     training_pairs = []
     for source_session, target_session in zip(X_train, Y_train):
@@ -202,7 +202,7 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     Y_train = torch.transpose(torch.cat(Y_train, dim=-1), 1, 0)
     torch.save(X_train, os.path.join(save_data_dir, 'X_train.bin'))
     torch.save(Y_train, os.path.join(save_data_dir, 'Y_train.bin'))
-    torch.save(customer_id_train, os.path.join(save_data_dir, 'customer_ids_train.bin'))
+    # torch.save(customer_id_train, os.path.join(save_data_dir, 'customer_ids_train.bin'))
 
     valid_pairs = []
     for source_session, target_session in zip(X_valid, Y_valid):
@@ -213,7 +213,7 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     Y_valid = torch.transpose(torch.cat(Y_valid, dim=-1), 1, 0)
     torch.save(X_valid, os.path.join(save_data_dir, 'X_valid.bin'))
     torch.save(Y_valid, os.path.join(save_data_dir, 'Y_valid.bin'))
-    torch.save(customer_id_valid, os.path.join(save_data_dir, 'customer_ids_valid.bin'))
+    # torch.save(customer_id_valid, os.path.join(save_data_dir, 'customer_ids_valid.bin'))
 
 
     return X_train, Y_train, X_valid, Y_valid
