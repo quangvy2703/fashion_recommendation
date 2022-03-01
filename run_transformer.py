@@ -12,4 +12,4 @@ def train_transformer(data_dir, saved_data_dir):
     # else:
     #     X_train, Y_train, X_valid, Y_valid = prepare_data(data_dir)
     X_train, Y_train, X_valid, Y_valid = prepare_data(data_dir, saved_data_dir)
-    train_transfomer(X_train, Y_train, X_valid, Y_valid)
+    train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir)
