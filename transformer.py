@@ -192,7 +192,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch, 
     total_batches = int(len(X_train)/batch_size) + 1
     indices = list(range(len(X_train)))
     losses = 0
-
+    step = 1
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)),
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
