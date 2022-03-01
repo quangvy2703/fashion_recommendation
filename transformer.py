@@ -201,8 +201,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch, 
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
         tgt = Y_train[batch]
-        src = src.to(DEVICE)
-        tgt = tgt.to(DEVICE)
+        src = torch.tensor(src).to(DEVICE)
+        tgt = torch.tensor(tgt).to(DEVICE)
 
         tgt_input = tgt[:-1, :]
 
@@ -226,8 +226,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab):
     losses = 0
     logits = []
     for src, tgt in zip(X_valid, Y_valid):
-        src = src.to(DEVICE)
-        tgt = tgt.to(DEVICE)
+        src = torch.tensor(src).to(DEVICE)
+        tgt = torch.tensor(tgt).to(DEVICE)
 
         tgt_input = tgt[:-1, :]
 
