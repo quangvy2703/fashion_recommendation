@@ -10,6 +10,6 @@ def train_transformer(data_dir, saved_data_dir):
         X_valid = torch.load(join(saved_data_dir, "X_valid.bin"))
         Y_valid = torch.load(join(saved_data_dir, "Y_valid.bin"))
     else:
-        X_train, Y_train, X_valid, Y_valid = prepare_data(data_dir)
-    X_train, Y_train, X_valid, Y_valid = prepare_data(data_dir, saved_data_dir)
+        X_train, Y_train, X_valid, Y_valid = prepare_data(data_dir, saved_data_dir)
+    # X_train, Y_train, X_valid, Y_valid = prepare_data(data_dir, saved_data_dir)
     train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir)
