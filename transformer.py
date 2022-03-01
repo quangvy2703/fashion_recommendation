@@ -66,10 +66,10 @@ class Vocab:
         article_features = []
         print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
         for article_index in self.index2article.keys():
-            article_id = self.index2article[article_index]]
+            article_id = self.index2article[article_index]
             if article_id not in [SOS_token, EOS_token, UNK_token, PAD_token]:
                 article_id = int(article_id)
-            article_features.append(self.article_features[self.index2article[article_index]])
+            article_features.append(self.article_features[article_id])
         self.article_features = article_features
 
     def index_article_features(self, index):
