@@ -54,6 +54,7 @@ class Vocab:
             self.index2article[n_articles] = article
 
     def get_article_features(self, path):
+
         self.article_features = pickle.load(open(path, 'rb')) 
         article_features_len = len(self.article_features[0]) - 1
         self.article_features = dict(zip(self.article_features[:, 0], self.article_features[:, 1:]))
@@ -292,6 +293,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     vocab = Vocab()
     vocab.from_file(saved_data_dir + '/vocab.txt')
     VOCAB_SIZE = len(vocab.article2index)
+    print("Vocab size ", VOCAB_SIZE)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = vocab.article_features
     print(article_features)
