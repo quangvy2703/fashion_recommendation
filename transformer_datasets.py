@@ -1,4 +1,5 @@
 
+import enum
 import pickle
 import pandas as pd
 # import seaborn as sns
@@ -121,39 +122,46 @@ class FashionDataset(Dataset):
         transactions_df['article_id'] = transactions_df['article_id'].astype(str)
         transactions_df['t_dat'] = pd.to_datetime(transactions_df['t_dat'], format="%Y-%m-%d")
         trans_by_cus = transactions_df.groupby(['customer_id'])
-        customer_ids = set(transactions_df.customer_id.values)
+        customer_ids = transactions_df.customer_id.unique()
         last_date = transactions_df['t_dat'].copy().sort_values().values[-1]
-        dat_t = transactions_df['dat_t']
-        last_train_date = last_date - np.timedelta64(self.config['PERIODS'], 'D')
-        
+        last_train_date = last_date - np.timedelta64(cfg['PERIODS'], 'D')
+        trans_by_cus = transactions_df[transactions_df['t_dat'] > last_train_date]
+        customer_filter_ids = trans_by_cus.customer_id.unique()
+        other_customer_ids = list(set(customer_ids) - set(customer_filter_ids))
+        trans_by_cus = trans_by_cus.groupby(['customer_id'])
         customer_sequences = {}
-        for customer_id in tqdm(customer_ids):
+        for customer_id in tqdm(customer_filter_ids, total=len(customer_filter_ids)):
             transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
-            test_indexes = np.array(transaction_of_customer[transaction_of_customer['dat_t'] >= last_train_date].index().to_list())
-            transaction = transaction_of_customer['article_id'].iloc[test_indexes].values()
-
-
-            excuce_date = transaction_of_customer.t_dat.values
-            from_last = np.asarray(excuce_date) - np.asarray([np.datetime64('0-01-01'), *excuce_date[:-1]])
-            transaction_of_customer['from_last'] = from_last.astype('timedelta64[D]').astype(np.int32)
-
-            indexes = np.array(transaction_of_customer[transaction_of_customer['from_last'] <= self.config['PERIODS']].index.to_list())
-            indexes = np.sort(np.unique(np.append(indexes, indexes-1)))
-
-            transaction_sessions = transaction_of_customer.iloc[indexes].reset_index(drop=True)
-            split_indexes = transaction_sessions.from_last[transaction_sessions.from_last > self.config['PERIODS']].index.to_list()
-            transaction_sessions = np.split(transaction_sessions.article_id.values, split_indexes[1:])
-            last_transaction_session = transaction_sessions[-1]
+            transactions = transaction_of_customer.article_id.values
             customer_sequences[customer_id] = []
             
+            session = []
+            for transaction in transactions:
+                session = session + list(map(int, transaction.split(',')))
+            customer_sequences[customer_id].append(session)
+
+
+
+
+        trans_by_cus = transactions_df.groupby(['customer_id'])
+
+        for customer_id in tqdm(other_customer_ids, total=len(other_customer_ids)):
+            transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
+            transaction = transaction_of_customer['article_id'].values
+
+            last_date = transaction_of_customer['t_dat'].copy().sort_values().values[-1]
+            last_train_date = last_date - np.timedelta64(cfg['PERIODS'], 'D')
+
+            last_session = transaction_of_customer[transaction_of_customer['t_dat'] >= last_train_date].article_id.values
+
+            customer_sequences[customer_id] = []
             a_session = []
-            for session in last_transaction_session:
+            for session in last_session:
                 a_session = a_session + list(map(int, session.split(',')))
 
-                customer_sequences[customer_id].append(a_session)
-    #         if len(customer_sequences) > 20:
-    #             break
-        with open('customer_sequences.pkl', "wb") as f:
+            customer_sequences[customer_id].append(a_session)
+
+        with open('datasets_transformer/customer_sequences_submission.pkl', "wb") as f:
             pickle.dump(customer_sequences, f)
 
     def article_processing(self):
@@ -211,48 +219,29 @@ class FashionDataset(Dataset):
     def create_dataset(self):
         with open("datasets/customer_sequences.pkl", "rb") as f:
             customer_sequences = pickle.load(f)
-        # with open("datasets/articles_processed.pkl", "rb") as f:
-        #     articles = pickle.load(f)
-        # with open("datasets/customers_processed.pkl", "rb") as f:
-        #     customers = pickle.load(f)
+        with open("datasets/articles_processed.pkl", "rb") as f:
+            articles = pickle.load(f)
+        with open("datasets/customers_processed.pkl", "rb") as f:
+            customers = pickle.load(f)
 
-        # articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
-        # customers_dict = dict(zip(customers[:,0], customers[:, 1:-1]))
+        articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
+        customers_dict = dict(zip(customers[:,0], customers[:, 1:-1]))
 
         samples = {}
         samples['customer_id'] = []
-        samples['sequence'] = []
-        samples['target'] = []
+        samples['target_features'] = []
         samples['customer_features'] = []
-        samples['sequence_features'] = []
-        articles_df = pd.read_csv(self.config['ARTICLES_PATH'])
-        article_ids = articles_df.article_id.values
+        samples['source_features'] = []
         customer_ids = customer_sequences.keys()
-        for customer_id in tqdm(customer_ids):
+        for customer_id in tqdm(customer_ids, total=len(customer_ids)):
             sequences = customer_sequences[customer_id]
-            # print(sequence)
-            for sequence in sequences:
-                for i in range(len(sequence) - 2):
-                    purchased = sequence[0: i + 2]
-                    if len(purchased) > self.config['MAX_SEQUENCE_LENGTH']:
-                        purchased = purchased[-self.config['MAX_SEQUENCE_LENGTH']: ]
-                    while True:
-                        unpurchased = random.choice(article_ids)
-                        if unpurchased not in sequence:
-                            break
-                    # Positive sample
-                    samples['customer_id'].append(customer_id)
-                    samples['sequence'].append(purchased)
-                    # sequence_features = [for article in ]
-                    # samples['sequence_features'].append([articles_dict[article] for article in purchased])
-                    # samples['customer_features'].append(customers_dict[customer_id])
-                    samples['target'].append(1)
-                    # Negative sample
-                    samples['customer_id'].append(customer_id)
-                    samples['sequence'].append(purchased[:-1] + [unpurchased])
-                    # samples['sequence_features'].append([articles_dict[article] for article in purchased])
-                    # samples['customer_features'].append(customers_dict[customer_id])
-                    samples['target'].append(0)
+
+            for idx in range(len(sequences) - 1):
+                # Create a corpus
+                samples['customer_id'].append(customer_id)
+                samples['source_features'].append([articles_dict[article] for article in sequences[idx]])
+                samples['target_features'].append([articles_dict[article] for article in sequences[idx + 1]])
+                samples['customer_features'].append(customers_dict[customer_id])
 
         indexes = [i for i in range(len(samples['target']))]
         x_train, x_test, y_train, y_test = train_test_split(indexes, samples['target'], test_size=0.3, shuffle=True)
@@ -264,5 +253,39 @@ class FashionDataset(Dataset):
         with open('datasets/valid_indexes.pkl', 'wb') as f:
             pickle.dump(x_test, f)
         
-    
-            
+        print(f"Created dataset with {len(samples['customer_id'])} corpus")
+
+    def create_dataset_submission(self):
+        with open("datasets/customer_sequences_submission.pkl", "rb") as f:
+            customer_sequences = pickle.load(f)
+        with open("datasets/articles_processed.pkl", "rb") as f:
+            articles = pickle.load(f)
+        with open("datasets/customers_processed.pkl", "rb") as f:
+            customers = pickle.load(f)
+
+        articles_dict = dict(zip(articles[:,0], articles[:, 1:]))
+        customers_dict = dict(zip(customers[:,0], customers[:, 1:-1]))
+
+        samples = {}
+        samples['customer_id'] = []
+        samples['target_features'] = []
+        samples['customer_features'] = []
+        samples['source_features'] = []
+        customer_ids = customer_sequences.keys()
+        for customer_id in tqdm(customer_ids, total=len(customer_ids)):
+            sequences = customer_sequences[customer_id]
+
+            for idx in range(len(sequences) - 1):
+                # Create a corpus
+                samples['customer_id'].append(customer_id)
+                samples['source_features'].append([articles_dict[article] for article in sequences[idx]])
+                samples['customer_features'].append(customers_dict[customer_id])
+
+
+        with open('datasets_transformer/all_samples_submission.pkl', 'wb') as f:
+            pickle.dump(samples, f)
+        
+        print(f"Created dataset with {len(samples['customer_id'])} corpus")
+        
+
+           

@@ -19,6 +19,7 @@ cfg["N_CLASSES"] = 2
 cfg["N_LAYERS"] = 2
 cfg["LR"] = 0.01
 cfg['MODELS_PATH'] = "saved_models"
+cfg['CONTINUE_TRAINING'] = False
 MAX_SEQUENCE_LENGTH = 10
 ARTICLE_FEATURES = ['article_id', 'product_type_no', 'graphical_appearance_no',
                     'colour_group_code', 'perceived_colour_value_id', 'perceived_colour_master_id',
