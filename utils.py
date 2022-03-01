@@ -10,7 +10,7 @@ special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def generate_square_subsequent_mask(sz):
-    mask = (torch.triu(torch.one((sz, sz), device=DEVICE)) == 1).transpose(0, 1)
+    mask = (torch.triu(torch.ones((sz, sz), device=DEVICE)) == 1).transpose(0, 1)
     mask = mask.float().masked_fill(mask == 0, float('-inf')).mask_fill(mask == 1, float(0.0))
     return mask
 
