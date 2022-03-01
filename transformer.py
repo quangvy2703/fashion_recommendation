@@ -55,8 +55,9 @@ class Vocab:
 
     def get_article_features(self, path):
         self.article_features = pickle.load(open(path, 'rb')) 
+        article_features_len = len(self.article_features[0]) - 1
         self.article_features = dict(zip(self.article_features[:, 0], self.article_features[:, 1:]))
-        article_features_len = len(self.article_features.values[0])
+        
         for i in [SOS_idx, EOS_idx, UNK_idx, PAD_idx]:
             self.article_features[i] = [0] * article_features_len
         article_features = []
