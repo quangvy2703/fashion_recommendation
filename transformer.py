@@ -229,14 +229,12 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
         src = X_train[batch]
-        for i in src:
-            print(i)
-        src_features = [article_features[i] for i in src]
+        src_features = [article_features[np.array(i, dtype=np.int32)] for i in src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
         tgt = Y_train[batch]
-        tgt_features = [article_features[i] for i in tgt]
+        tgt_features =  [article_features[np.array(i, dtype=np.int32)] for i in tgt]
         src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
         src_features = torch.tensor(src_features, dtype=torch.float64).to(DEVICE)
@@ -264,11 +262,11 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
     losses = 0
     logits = []
     for src, tgt in zip(X_valid, Y_valid):
-        src_features = article_features[src.numpy()]
+        src_features =  [article_features[np.array(i, dtype=np.int32)] for i in src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
-        tgt_features = article_features[tgt.numpy()]
+        tgt_features =  [article_features[np.array(i, dtype=np.int32)] for i in tgt]
         src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
 
