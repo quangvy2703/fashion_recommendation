@@ -16,7 +16,7 @@ import math
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-max_length = 10
+max_length = 50
 VOCAB_SIZE = 0
 min_article_count = 1
 
@@ -93,6 +93,8 @@ def preprocess_corpus(trans, min_article_count):
         tran = []
         for session in sessions:
             session = [art if n_articles[art] >= min_article_count else UNK_idx for art in session]
+            if len(session) > max_length:
+                session = session[-12: ]
             # trans[customer_id][idx] = session
             tran.append(session)
         cus_ids.extend([customer_id] * (len(tran) - 1))
