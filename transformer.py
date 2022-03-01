@@ -12,6 +12,7 @@ import os
 from datetime import datetime
 from utils import *
 import math
+from config import *
 
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -51,6 +52,28 @@ class Vocab:
             n_articles = len(self)
             self.article2index[article] = n_articles
             self.index2article[n_articles] = article
+
+    def get_article_features(self, path):
+        self.article_features = pickle.load(open(path, 'r')) 
+        self.article_features = dict(zip(self.article_features[:, 0], self.article_features[:, 1:]))
+        article_features_len = len(self.article_features[0, 1:])
+        for i in [SOS_idx, EOS_idx, UNK_idx, PAD_idx]:
+            self.article_features[i] = [0] * article_features_len
+        article_features = []
+        for article_index in self.index2article.keys():
+            article_features.append(self.article_features[article_index])
+        self.article_features = article_features
+
+    def index_article_features(self, index):
+        article_id = self.index2article(index)
+        return self.article_features[article_id]
+    
+    def get_customer_features(self, path):
+        self.customer_features = pickle.load(open(path, 'r')) 
+        self.customer_features = dict(zip(self.customer_features[:, 0], self.customer_features[:, 1:-1]))
+
+    def customer_feature(self, customer_id):
+        return self.customer_features[customer_id]
 
     def __len__(self):
         assert len(self.index2article) == len(self.article2index)
@@ -163,7 +186,12 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     print('Corpus length: {}\nVocabulary size: {}'.format(
         len(source), len(vocab.article2index)))
 
-    X_train, X_valid, Y_train, Y_valid = train_test_split(source, target, test_size=0.2, random_state=42)
+    X_train, X_valid, Y_train, Y_valid = train_test_split([customer_ids, source], target, test_size=0.2, random_state=42)
+
+    customer_id_train = X_train[:, 1]
+    X_train = X_train[:, 0]
+    customer_id_valid = X_valid[:, 1]
+    X_valid = X_valid[:, 0]
 
     training_pairs = []
     for source_session, target_session in zip(X_train, Y_train):
@@ -174,6 +202,7 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     Y_train = torch.transpose(torch.cat(Y_train, dim=-1), 1, 0)
     torch.save(X_train, os.path.join(save_data_dir, 'X_train.bin'))
     torch.save(Y_train, os.path.join(save_data_dir, 'Y_train.bin'))
+    torch.save(customer_id_train, os.path.join(save_data_dir, 'customer_ids_train.bin'))
 
     valid_pairs = []
     for source_session, target_session in zip(X_valid, Y_valid):
@@ -184,11 +213,12 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     Y_valid = torch.transpose(torch.cat(Y_valid, dim=-1), 1, 0)
     torch.save(X_valid, os.path.join(save_data_dir, 'X_valid.bin'))
     torch.save(Y_valid, os.path.join(save_data_dir, 'Y_valid.bin'))
+    torch.save(customer_id_valid, os.path.join(save_data_dir, 'customer_ids_valid.bin'))
 
 
     return X_train, Y_train, X_valid, Y_valid
 
-def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch, saved_data_dir="saved_data_dir"):
+def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article_features, epoch, saved_data_dir="saved_data_dir"):
     model.train()
     total_batches = int(len(X_train)/batch_size) + 1
     indices = list(range(len(X_train)))
@@ -198,18 +228,22 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch, 
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
         src = X_train[batch]
+        src_features = article_features[src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
         tgt = Y_train[batch]
+        tgt_features = article_features[tgt]
         src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
-
+        src_features = torch.tensor(src_features, dtype=torch.float64).to(DEVICE)
+        tgt_features = torch.tensor(tgt_features, dtype=torch.float64).to(DEVICE)
         tgt_input = tgt[:-1, :]
+        tgt_features = tgt_features[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
 
-        logits = model(src, tgt_input, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
+        logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
 
         optimizer.zero_grad()
 
@@ -222,19 +256,26 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch, 
 
     return losses / len(X_train)
 
-def evaluate(model, loss_fn, X_valid, Y_valid, vocab):
+def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
     model.eval()
     losses = 0
     logits = []
     for src, tgt in zip(X_valid, Y_valid):
+        src_features = article_features[src]
+        # y for teacher forcing is all sequence without a last element
+        # y_tf = Y_train[batch, :-1]
+        # y for loss calculation is all sequence without a last element
+        tgt_features = article_features[tgt]
         src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
 
+        src_features = torch.tensor(src_features, dtype=torch.float64).to(DEVICE)
+        tgt_features = torch.tensor(tgt_features, dtype=torch.float64).to(DEVICE)
         tgt_input = tgt[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
 
-        logit = model(src, tgt_input, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
+        logit = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
         logits.append(vocab.unidex_words(logit[1:-1]))
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
@@ -249,6 +290,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     vocab = Vocab()
     vocab.from_file(saved_data_dir + '/vocab.txt')
     VOCAB_SIZE = len(vocab.article2index)
+    article_features = vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
 
     EMB_SIZE = 512
     NHEAD = 8
@@ -278,9 +320,9 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     optimizer = torch.optim.Adam(transformer.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
     for epoch in range(N_EPOCHS):
         start_time = datetime.now()
-        train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, epoch)
+        train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
         end_time = datetime.now()
-        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, vocab)
+        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, vocab, article_features)
         map12 = mean_average_precision(Y_valid, logits)
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(end_time - start_time):.3f}s"))
             # Early Stop
