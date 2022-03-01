@@ -64,7 +64,7 @@ class Vocab:
         for i in [SOS_token, EOS_token, UNK_token, PAD_token]:
             self.article_features[i] = [0] * article_features_len
         article_features = []
-        print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
+        # print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
         for article_index in self.index2article.keys():
             article_id = self.index2article[article_index]
             if article_id not in [SOS_token, EOS_token, UNK_token, PAD_token]:
@@ -302,8 +302,6 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     print("Vocab size ", VOCAB_SIZE)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = vocab.article_features
-    print(vocab.index2article)
-    print(VOCAB_SIZE)
     EMB_SIZE = 512
     NHEAD = 8
     FFN_HID_DIM = 512
