@@ -50,6 +50,7 @@ class Vocab:
     def index_article(self, article):
         if article not in self.article2index:
             n_articles = len(self)
+            VOCAB_SIZE = n_articles
             self.article2index[article] = n_articles
             self.index2article[n_articles] = article
 
@@ -96,6 +97,7 @@ class Vocab:
         with open(filename, 'r') as f:
             words = [l.strip() for l in f.readlines()]
             vocab.index_articles(words)
+
 
 
 def preprocess_corpus(trans, min_article_count):
