@@ -69,7 +69,7 @@ class Vocab:
         vocab = Vocab()
         with open(filename, 'r') as f:
             words = [l.strip() for l in f.readlines()]
-            vocab.index_words(words)
+            vocab.index_articles(words)
 
 
 def preprocess_corpus(trans, min_article_count):
