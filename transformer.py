@@ -125,9 +125,10 @@ def indexes_from_transaction(vocab, transaction):
 
 def tensor_from_transaction(vocab, transaction, max_seq_length):
     indexes = indexes_from_transaction(vocab, transaction)
+    if len(indexes) > max_seq_length:
+        indexes = indexes[-max_seq_length:]
     indexes.append(EOS_idx)
     indexes.insert(0, SOS_idx)
-
     if len(indexes) < max_seq_length:
         indexes += [PAD_idx] * (max_seq_length - len(indexes))
     tensor = torch.LongTensor(indexes)
