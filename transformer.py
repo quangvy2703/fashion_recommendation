@@ -98,6 +98,7 @@ class Vocab:
         with open(filename, 'r') as f:
             words = [l.strip() for l in f.readlines()]
             vocab.index_articles(words)
+        return vocab
 
 
 
@@ -294,7 +295,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     torch.manual_seed(0)
 
     vocab = Vocab()
-    vocab.from_file(saved_data_dir + '/vocab.txt')
+    vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
     print("Vocab size ", VOCAB_SIZE)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = vocab.article_features
