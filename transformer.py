@@ -63,18 +63,12 @@ class Vocab:
         with open(filename, 'w') as f:
             f.write('\n'.join(values))
 
-    @classmethod
-    def from_file(cls, filename):
+    # @classmethod
+    def from_file(self, filename):
         vocab = Vocab()
-        with open(filename, 'rb') as f:
-            data = pickle.load(f)
-            customer_ids = data.keys()
-            for customer_id in tqdm(customer_ids):
-                _len = len(data[customer_id])
-                if _len < 2:
-                    continue
-                for tran in data[customer_id]:
-                    vocab.index_words(tran)
+        with open(filename, 'r') as f:
+            words = [l.strip() for l in f.readlines()]
+            vocab.index_words(words)
 
 
 def preprocess_corpus(trans, min_article_count):
@@ -154,7 +148,7 @@ def batch_generator(batch_indices, batch_size):
             yield batch_indices[batch_start:batch_end]
     
 
-def prepare_data(data_dir="datasets_transformer"):
+def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     max_seq_length = MAX_SEQUENCE_LENGTH + 2
     transactions = pickle.load(open(data_dir + '/customer_sequences.pkl', 'rb'))
     customer_ids, source, target = preprocess_corpus(transactions, 1)
@@ -174,8 +168,8 @@ def prepare_data(data_dir="datasets_transformer"):
     X_train, Y_train = zip(*training_pairs)
     X_train = torch.transpose(torch.cat(X_train, dim=-1), 1, 0)
     Y_train = torch.transpose(torch.cat(Y_train, dim=-1), 1, 0)
-    torch.save(X_train, os.path.join(data_dir, 'X_train.bin'))
-    torch.save(Y_train, os.path.join(data_dir, 'Y_train.bin'))
+    torch.save(X_train, os.path.join(save_data_dir, 'X_train.bin'))
+    torch.save(Y_train, os.path.join(save_data_dir, 'Y_train.bin'))
 
     valid_pairs = []
     for source_session, target_session in zip(X_valid, Y_valid):
@@ -184,18 +178,17 @@ def prepare_data(data_dir="datasets_transformer"):
     X_valid, Y_valid = zip(*valid_pairs)
     X_valid = torch.transpose(torch.cat(X_valid, dim=-1), 1, 0)
     Y_valid = torch.transpose(torch.cat(Y_valid, dim=-1), 1, 0)
-    torch.save(X_valid, os.path.join(data_dir, 'X_valid.bin'))
-    torch.save(Y_valid, os.path.join(data_dir, 'Y_valid.bin'))
+    torch.save(X_valid, os.path.join(save_data_dir, 'X_valid.bin'))
+    torch.save(Y_valid, os.path.join(save_data_dir, 'Y_valid.bin'))
 
 
     return X_train, Y_train, X_valid, Y_valid
 
-def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch):
+def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch, saved_data_dir="saved_data_dir"):
     model.train()
     total_batches = int(len(X_train)/batch_size) + 1
     indices = list(range(len(X_train)))
     losses = 0
-    
 
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)),
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
@@ -225,7 +218,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch):
 
     return losses / len(X_train)
 
-def evaluate(model, loss_fn, X_valid, Y_valid):
+def evaluate(model, loss_fn, X_valid, Y_valid, vocab):
     model.eval()
     losses = 0
     logits = []
@@ -238,7 +231,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid):
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
 
         logit = model(src, tgt_input, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
-        logits.append(logit)
+        logits.append(vocab.unidex_words(logit[1:-1]))
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
@@ -246,9 +239,13 @@ def evaluate(model, loss_fn, X_valid, Y_valid):
     return losses / len(X_valid), logits
 
 
-def train_transfomer(X_train, Y_train, X_valid, Y_valid):
+def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     torch.manual_seed(0)
-    VOCAB_SIZE = VOCAB_SIZE
+
+    vocab = Vocab()
+    vocab.from_file(saved_data_dir)
+    VOCAB_SIZE = len(vocab.article2index)
+
     EMB_SIZE = 512
     NHEAD = 8
     FFN_HID_DIM = 512
@@ -261,6 +258,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid):
     early_stop_after = 10
     early_stop_counter = 0
     best_model = None
+
 
     transformer = Seq2SeqTransformer(NUM_ENCODER_LAYERS, NUM_DECODER_LAYERS, EMB_SIZE,
                                     NHEAD, VOCAB_SIZE, VOCAB_SIZE, FFN_HID_DIM)
@@ -278,7 +276,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid):
         start_time = datetime.now()
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, epoch)
         end_time = datetime.now()
-        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid)
+        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, vocab)
         map12 = mean_average_precision(Y_valid, logits)
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(end_time - start_time):.3f}s"))
             # Early Stop

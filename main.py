@@ -20,6 +20,7 @@ warnings.filterwarnings("ignore")
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_dir', type=str, default='datasets')
+    parser.add_argument('--saved_data_dir', type=str, default='processed')
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--hidden', type=int, default=1024)
     parser.add_argument('--batch_size', type=int, default=16)
@@ -44,7 +45,7 @@ if __name__ == '__main__':
 
     # trainer = Training(cfg)
     # trainer.start_training()
-    train_transformer(data_dir=args.data_dir)
+    train_transformer(data_dir=args.data_dir, saved_data_dir=args.saved_data_dir)
 
 # from transformer import *
 
