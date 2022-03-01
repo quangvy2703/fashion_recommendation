@@ -66,7 +66,7 @@ class Vocab:
         article_features = []
         print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
         for article_index in self.index2article.keys():
-            article_features.append(self.article_features[article_index])
+            article_features.append(self.article_features[self.index2article[article_index]])
         self.article_features = article_features
 
     def index_article_features(self, index):
