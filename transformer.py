@@ -61,6 +61,7 @@ class Vocab:
         for i in [SOS_idx, EOS_idx, UNK_idx, PAD_idx]:
             self.article_features[i] = [0] * article_features_len
         article_features = []
+        print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
         for article_index in self.index2article.keys():
             article_features.append(self.article_features[article_index])
         self.article_features = article_features
