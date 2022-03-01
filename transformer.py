@@ -196,6 +196,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, epoch, 
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)),
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
+        print(batch)
+        print(X_train.shape)
         src = X_train[batch, :]
         # y for teacher forcing is all sequence without a last element
         y_tf = Y_train[batch, :-1]
