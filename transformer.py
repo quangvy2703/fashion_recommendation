@@ -163,7 +163,7 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
 
     training_pairs = []
     for source_session, target_session in zip(X_train, Y_train):
-        training_pairs.append(tensor_from_pair(source_session, target_session, max_seq_length))
+        training_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))
     
     X_train, Y_train = zip(*training_pairs)
     X_train = torch.transpose(torch.cat(X_train, dim=-1), 1, 0)
@@ -173,7 +173,7 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
 
     valid_pairs = []
     for source_session, target_session in zip(X_valid, Y_valid):
-        valid_pairs.append(tensor_from_pair(source_session, target_session, max_seq_length))      
+        valid_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))      
 
     X_valid, Y_valid = zip(*valid_pairs)
     X_valid = torch.transpose(torch.cat(X_valid, dim=-1), 1, 0)
