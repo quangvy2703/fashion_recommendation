@@ -168,8 +168,8 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
         training_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))
     
     X_train, Y_train = zip(*training_pairs)
-    X_train = torch.transpose(torch.cat(X_train, dim=-1), 1, 0)
-    Y_train = torch.transpose(torch.cat(Y_train, dim=-1), 1, 0)
+    X_train = torch.transpose(X_train, 1, 0)
+    Y_train = torch.transpose(Y_train, 1, 0)
     torch.save(X_train, os.path.join(save_data_dir, 'X_train.bin'))
     torch.save(Y_train, os.path.join(save_data_dir, 'Y_train.bin'))
 
