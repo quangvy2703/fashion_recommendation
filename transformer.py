@@ -298,7 +298,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     print("Vocab size ", VOCAB_SIZE)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = vocab.article_features
-    print(article_features)
+    print(vocab.index2article)
     print(VOCAB_SIZE)
     EMB_SIZE = 512
     NHEAD = 8
