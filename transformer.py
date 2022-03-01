@@ -54,7 +54,7 @@ class Vocab:
             self.index2article[n_articles] = article
 
     def get_article_features(self, path):
-        self.article_features = pickle.load(open(path, 'r')) 
+        self.article_features = pickle.load(open(path, 'rb')) 
         self.article_features = dict(zip(self.article_features[:, 0], self.article_features[:, 1:]))
         article_features_len = len(self.article_features[0, 1:])
         for i in [SOS_idx, EOS_idx, UNK_idx, PAD_idx]:
@@ -69,7 +69,7 @@ class Vocab:
         return self.article_features[article_id]
     
     def get_customer_features(self, path):
-        self.customer_features = pickle.load(open(path, 'r')) 
+        self.customer_features = pickle.load(open(path, 'rb')) 
         self.customer_features = dict(zip(self.customer_features[:, 0], self.customer_features[:, 1:-1]))
 
     def customer_feature(self, customer_id):
