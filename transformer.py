@@ -1,3 +1,4 @@
+from ntpath import join
 import pickle
 from tqdm import tqdm
 from config import MAX_SEQUENCE_LENGTH
@@ -245,7 +246,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     torch.manual_seed(0)
 
     vocab = Vocab()
-    vocab.from_file(saved_data_dir)
+    vocab.from_file(join(saved_data_dir, 'vocab.txt'))
     VOCAB_SIZE = len(vocab.article2index)
 
     EMB_SIZE = 512
