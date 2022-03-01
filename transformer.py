@@ -153,7 +153,7 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     transactions = pickle.load(open(data_dir + '/customer_sequences.pkl', 'rb'))
     customer_ids, source, target = preprocess_corpus(transactions, 1)
     vocab = read_vocab(source, target)
-    vocab.to_file(os.path.join(data_dir, 'vocab.txt'))
+    vocab.to_file(os.path.join(save_data_dir, 'vocab.txt'))
     global VOCAB_SIZE
     VOCAB_SIZE = len(vocab.article2index)
     print('Corpus length: {}\nVocabulary size: {}'.format(
