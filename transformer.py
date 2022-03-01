@@ -231,7 +231,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         src = X_train[batch]
         for i in src:
             print(i, i[5])
-        src_features = [article_features[np.array(i, dtype=np.int32)] for i in src]
+        src_features = article_features[[1, 3, 5]]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
