@@ -48,6 +48,7 @@ class Vocab:
             self.index_article(article)
 
     def index_article(self, article):
+        global VOCAB_SIZE
         if article not in self.article2index:
             n_articles = len(self)
             VOCAB_SIZE = n_articles
