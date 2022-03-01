@@ -178,8 +178,8 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
         valid_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))      
 
     X_valid, Y_valid = zip(*valid_pairs)
-    X_valid = torch.transpose(torch.cat(X_valid, dim=-1), 1, 0)
-    Y_valid = torch.transpose(torch.cat(Y_valid, dim=-1), 1, 0)
+    X_valid = torch.transpose(X_valid, 1, 0)
+    Y_valid = torch.transpose(Y_valid, 1, 0)
     torch.save(X_valid, os.path.join(save_data_dir, 'X_valid.bin'))
     torch.save(Y_valid, os.path.join(save_data_dir, 'Y_valid.bin'))
 
