@@ -229,9 +229,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
         src = X_train[batch]
-        for i in src:
-            print(i, i[5])
-        src_features = article_features[[1, 3, 5]]
+        src_features = [article_features[np.array(i, dtype=np.int32)] for i in src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
@@ -295,6 +293,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     VOCAB_SIZE = len(vocab.article2index)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = vocab.article_features
+    print(article_features)
     EMB_SIZE = 512
     NHEAD = 8
     FFN_HID_DIM = 512
