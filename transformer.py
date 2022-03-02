@@ -389,11 +389,12 @@ class ArticleEmbedding(nn.Module):
         # self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, tok_emb: Tensor, article_features: Tensor):
+        print(tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
         # output = output * transaction_encoder_output
         # output = self.out(output)
         # output = self.softmax(output)
-        print(tok_emb.size(), article_features.size(), output.size())
+        
         return self.dropout(output + tok_emb)
 
 class Seq2SeqTransformer(nn.Module):
