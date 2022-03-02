@@ -244,7 +244,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
-        tgt = Y_train[batch]
+        tgt = Y_train[:, batch]
         tgt_features =  [article_features[np.array(i, dtype=np.int32)] for i in tgt]
         src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
