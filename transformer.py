@@ -244,7 +244,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                         total=total_batches)
     try:
         for step, batch in t:
-            if step < 1132:
+            if step < 5258:
                 continue
             src = X_train[:, batch]
             # torch.save(src, 'src.bin')
