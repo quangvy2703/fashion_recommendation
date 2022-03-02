@@ -251,6 +251,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
             # y_tf = Y_train[batch, :-1]
             # y for loss calculation is all sequence without a last element
             tgt = Y_train[:, batch]
+            torch.save(tgt, 'tgt.bin')
             tgt_features =  [article_features[i] for i in tgt]
             src = torch.tensor(src, dtype=torch.long).to(DEVICE)
             tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
