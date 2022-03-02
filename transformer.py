@@ -230,15 +230,15 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
 
 def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article_features, epoch, saved_data_dir="saved_data_dir"):
     model.train()
-    total_batches = int(len(X_train)/batch_size) + 1
+    total_batches = int(X_train.shape[1]/batch_size) + 1
     print(total_batches)
-    indices = list(range(len(X_train)))
+    indices = list(range(X_train.shape[1]))
     losses = 0
     step = 1
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)),
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
-        src = X_train[batch]
+        src = X_train[:, batch]
         torch.save(src, 'src.bin')
         src_features = [article_features[i] for i in src]
         # y for teacher forcing is all sequence without a last element
