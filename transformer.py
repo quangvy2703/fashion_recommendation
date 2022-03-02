@@ -244,14 +244,16 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                         total=total_batches)
     try:
         for step, batch in t:
+            if step < 1132:
+                continue
             src = X_train[:, batch]
-            torch.save(src, 'src.bin')
+            # torch.save(src, 'src.bin')
             src_features = [article_features[i] for i in src]
             # y for teacher forcing is all sequence without a last element
             # y_tf = Y_train[batch, :-1]
             # y for loss calculation is all sequence without a last element
             tgt = Y_train[:, batch]
-            torch.save(tgt, 'tgt.bin')
+            # torch.save(tgt, 'tgt.bin')
             tgt_features =  [article_features[i] for i in tgt]
             src = torch.tensor(src, dtype=torch.long).to(DEVICE)
             tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
@@ -262,7 +264,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
 
             src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
             # print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
-            logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
+            logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
 
             optimizer.zero_grad()
 
@@ -313,7 +315,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     vocab = Vocab()
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
-    print("Vocab size ", VOCAB_SIZE)
+    print("Vocab size ", VOCAB_SIZE, len(vocab.article2index.keys()))
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = np.array(vocab.article_features, dtype=np.double)
 
