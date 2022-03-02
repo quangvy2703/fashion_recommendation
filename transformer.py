@@ -241,39 +241,41 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     batch_loss = 10
     t = tqdm(enumerate(batch_generator(indices, batch_size)),
                             desc=f'Training epoch {epoch+1} - step {step} - loss {batch_loss}',
-                            total=total_batches)
-    for step, batch in t:
-        src = X_train[:, batch]
-        # torch.save(src, 'src.bin')
-        src_features = [article_features[i] for i in src]
-        # y for teacher forcing is all sequence without a last element
-        # y_tf = Y_train[batch, :-1]
-        # y for loss calculation is all sequence without a last element
-        tgt = Y_train[:, batch]
-        tgt_features =  [article_features[i] for i in tgt]
-        src = torch.tensor(src, dtype=torch.long).to(DEVICE)
-        tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
-        src_features = torch.tensor(src_features, dtype=torch.double).to(DEVICE)
-        tgt_features = torch.tensor(tgt_features, dtype=torch.double).to(DEVICE)
-        tgt_input = tgt[:-1, :]
-        tgt_features = tgt_features[:-1, :]
+                        total=total_batches)
+    try:
+        for step, batch in t:
+            src = X_train[:, batch]
+            # torch.save(src, 'src.bin')
+            src_features = [article_features[i] for i in src]
+            # y for teacher forcing is all sequence without a last element
+            # y_tf = Y_train[batch, :-1]
+            # y for loss calculation is all sequence without a last element
+            tgt = Y_train[:, batch]
+            tgt_features =  [article_features[i] for i in tgt]
+            src = torch.tensor(src, dtype=torch.long).to(DEVICE)
+            tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
+            src_features = torch.tensor(src_features, dtype=torch.double).to(DEVICE)
+            tgt_features = torch.tensor(tgt_features, dtype=torch.double).to(DEVICE)
+            tgt_input = tgt[:-1, :]
+            tgt_features = tgt_features[:-1, :]
 
-        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
-        # print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
-        logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
+            src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
+            # print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
+            logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
 
-        optimizer.zero_grad()
+            optimizer.zero_grad()
 
-        tgt_out = tgt[1:, :]
-        # print("Loss, ", tgt_out.size(), logits.size())
-        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
-        loss.backward()
+            tgt_out = tgt[1:, :]
+            # print("Loss, ", tgt_out.size(), logits.size())
+            loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+            loss.backward()
 
-        optimizer.step()
-        losses += loss.item()
-        batch_loss = loss.item() / float(batch_size)
-        t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
-
+            optimizer.step()
+            losses += loss.item()
+            batch_loss = loss.item() / float(batch_size)
+            t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
+    except:
+        torch.save(src, "src.bin")
     return losses / X_train.shape[1]
 
 def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
