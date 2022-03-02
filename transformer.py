@@ -247,8 +247,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         tgt_features =  [article_features[np.array(i, dtype=np.int32)] for i in tgt]
         src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
-        src_features = torch.tensor(src_features, dtype=torch.float64).to(DEVICE)
-        tgt_features = torch.tensor(tgt_features, dtype=torch.float64).to(DEVICE)
+        src_features = torch.tensor(src_features, dtype=torch.double).to(DEVICE)
+        tgt_features = torch.tensor(tgt_features, dtype=torch.double).to(DEVICE)
         tgt_input = tgt[:-1, :]
         tgt_features = tgt_features[:-1, :]
 
