@@ -302,7 +302,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
     print("Vocab size ", VOCAB_SIZE)
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
-    article_features = np.array(vocab.article_features)
+    article_features = np.array(vocab.article_features, dtype=np.double)
 
     # torch.save(article_features, "article_features.bin")
     EMB_SIZE = 512
