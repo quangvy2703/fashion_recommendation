@@ -44,7 +44,7 @@ class Vocab:
         self.article2index = {v: k for k, v in self.index2article.items()}
 
     def index_articles(self, articles):
-        for article in tqdm(articles, desc="Indexing articles..."):
+        for article in articles:
             self.index_article(article)
 
     def index_article(self, article):
