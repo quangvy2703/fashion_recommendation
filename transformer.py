@@ -283,6 +283,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
         src_features = torch.tensor(src_features, dtype=torch.float64).to(DEVICE)
         tgt_features = torch.tensor(tgt_features, dtype=torch.float64).to(DEVICE)
         tgt_input = tgt[:-1, :]
+        tgt_features = tgt_features[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
 
