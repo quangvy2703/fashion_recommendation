@@ -376,7 +376,8 @@ class TokenEmbedding(nn.Module):
         self.emb_size = emb_size
 
     def forward(self, tokens: Tensor):
-        return self.embedding(tokens.long()) 
+        print("Token size ", tokens.size())
+        return self.embedding(tokens.long()) * math.sqrt(self.emb_size) 
 
 
 
