@@ -60,7 +60,7 @@ class Vocab:
         self.article_features = pickle.load(open(path, 'rb')) 
         article_features_len = len(self.article_features[0]) - 1
         self.article_features = dict(zip(self.article_features[:, 0], self.article_features[:, 1:]))
-        
+        self.article_features_size = article_features_len
         for i in [SOS_token, EOS_token, UNK_token, PAD_token]:
             self.article_features[i] = [0] * article_features_len
         article_features = []
@@ -320,7 +320,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
 
     transformer = Seq2SeqTransformer(NUM_ENCODER_LAYERS, NUM_DECODER_LAYERS, EMB_SIZE,
-                                    NHEAD, VOCAB_SIZE, VOCAB_SIZE, FFN_HID_DIM)
+                                    NHEAD, VOCAB_SIZE, vocab.article_features_size, FFN_HID_DIM)
 
     for p in transformer.parameters():
         if p.dim() > 1:
