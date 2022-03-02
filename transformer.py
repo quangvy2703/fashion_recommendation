@@ -52,9 +52,9 @@ class Vocab:
         global VOCAB_SIZE
         if article not in self.article2index:
             n_articles = len(self)
-            VOCAB_SIZE = n_articles
             self.article2index[article] = n_articles
             self.index2article[n_articles] = article
+            VOCAB_SIZE = len(self.index2article.keys())
 
     def get_article_features(self, path):
 
