@@ -436,6 +436,7 @@ class Seq2SeqTransformer(nn.Module):
                 memory_key_padding_mask: Tensor):
         src_emb = self.token_emb(src)
         src_emb = self.token_emb(tgt)
+        print("In S2S", src.size(), tgt.size(), src_emb.size(), tgt_emb.size())
         src_emb = self.article_emb(src_emb, src_feat)
         tgt_emb = self.article_emb(tgt_emb, tgt_feat)
         output = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, None, src_padding_mask, tgt_padding_mask, memory_key_padding_mask)
