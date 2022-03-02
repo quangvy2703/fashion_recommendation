@@ -382,14 +382,14 @@ class ArticleEmbedding(nn.Module):
     def __init__(self, article_features_size, emb_size, dropout=0.1):
         super(ArticleEmbedding, self).__init__()
         self.emb_size = emb_size
-
+        self.article_features_size = article_features_size
         self.article_emb = nn.Linear(article_features_size, self.emb_size)
         self.dropout = nn.Dropout(dropout)
         # self.out = nn.Linear(hidden_size, hidden_size)
         # self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, tok_emb: Tensor, article_features: Tensor):
-        print(tok_emb.size(), article_features.size())
+        print(self.article_features_size, tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
         # output = output * transaction_encoder_output
         # output = self.out(output)
