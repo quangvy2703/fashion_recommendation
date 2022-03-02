@@ -1,5 +1,6 @@
 from ntpath import join
 import pickle
+from random import random
 from tqdm import tqdm
 from config import MAX_SEQUENCE_LENGTH
 from torch import Tensor
@@ -18,7 +19,7 @@ from config import *
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-max_length = 50
+max_length = MAX_SEQUENCE_LENGTH
 VOCAB_SIZE = 0
 min_article_count = 1
 
@@ -233,6 +234,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     total_batches = int(X_train.shape[1]/batch_size) + 1
     # print(total_batches)
     indices = list(range(X_train.shape[1]))
+    if epoch > 0:
+        random.shuffle(indices)
     losses = 0
     step = 1
     batch_loss = 10
@@ -358,6 +361,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
             print('No improvements for {} epochs.'.format(early_stop_counter))
             if early_stop_counter >= early_stop_after:
                 print('Early stop!')
+                torch.save(best_model, os.path.join(saved_data_dir, 'best_epoch.pth'))
                 break    
 
 class CustomerEmbedding(nn.Module):

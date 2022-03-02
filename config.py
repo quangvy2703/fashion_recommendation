@@ -5,7 +5,7 @@ cfg["CUSTOMERS_PATH"] = "datasets/customers.csv"
 cfg['DATA_DIR'] = "datasets"
 
 cfg["MIN_SEQUENCE_LENGTH"] = 2
-cfg["MAX_SEQUENCE_LENGTH"] = 10
+cfg["MAX_SEQUENCE_LENGTH"] = 50
 cfg["PERIODS"] = 7
 cfg["AGE_FILL_VALUE"] = 36
 cfg["BATCH_SIZE"] = 16
