@@ -208,8 +208,8 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
         training_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))
     
     X_train, Y_train = zip(*training_pairs)
-    X_train = torch.transpose(torch.cat(X_train, dim=-1), 1, 0)
-    Y_train = torch.transpose(torch.cat(Y_train, dim=-1), 1, 0)
+    X_train = torch.cat(X_train, dim=-1)
+    Y_train = torch.cat(Y_train, dim=-1)
     torch.save(X_train, os.path.join(save_data_dir, 'X_train.bin'))
     torch.save(Y_train, os.path.join(save_data_dir, 'Y_train.bin'))
     # torch.save(customer_id_train, os.path.join(save_data_dir, 'customer_ids_train.bin'))
@@ -219,8 +219,8 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
         valid_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))      
 
     X_valid, Y_valid = zip(*valid_pairs)
-    X_valid = torch.transpose(torch.cat(X_valid, dim=-1), 1, 0)
-    Y_valid = torch.transpose(torch.cat(Y_valid, dim=-1), 1, 0)
+    X_valid = torch.cat(X_valid, dim=-1)
+    Y_valid = torch.cat(Y_valid, dim=-1)
     torch.save(X_valid, os.path.join(save_data_dir, 'X_valid.bin'))
     torch.save(Y_valid, os.path.join(save_data_dir, 'Y_valid.bin'))
     # torch.save(customer_id_valid, os.path.join(save_data_dir, 'customer_ids_valid.bin'))
