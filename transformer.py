@@ -307,7 +307,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     # torch.save(article_features, "article_features.bin")
     EMB_SIZE = 512
-    NHEAD = 8
+    NHEAD = 4
     FFN_HID_DIM = 512
     BATCH_SIZE = 128
     NUM_ENCODER_LAYERS = 3
