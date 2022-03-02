@@ -281,16 +281,34 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         torch.save(src, "src.bin")
     return losses / X_train.shape[1]
 
-def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
+def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features, batch_size, epoch):
     model.eval()
     losses = 0
     logits = []
-    for src, tgt in zip(X_valid, Y_valid):
-        src_features =  [article_features[np.array(i, dtype=np.int32)] for i in src]
+    total_batches = int(X_valid.shape[1]/batch_size) + 1
+    indices = list(range(X_valid.shape[1]))
+    step = 1
+    batch_loss = 10
+
+    t = tqdm(enumerate(batch_generator(indices, batch_size)),
+                            desc=f'Training epoch {epoch+1} - step {step} - loss {batch_loss}',
+                            total=total_batches)
+
+    for step, batch in t:
+        src = X_valid[:, batch]
+        # torch.save(src, 'src.bin')
+        src_features = [article_features[i] for i in src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
-        tgt_features =  [article_features[np.array(i, dtype=np.int32)] for i in tgt]
+        tgt = Y_valid[:, batch]
+        # torch.save(tgt, 'tgt.bin')
+        
+        src_features =  [article_features[i] for i in src]
+        # y for teacher forcing is all sequence without a last element
+        # y_tf = Y_train[batch, :-1]
+        # y for loss calculation is all sequence without a last element
+        tgt_features =  [article_features[i] for i in tgt]
         src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
 
@@ -306,6 +324,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
+        batch_loss = loss.item() / float(batch_size)
+        t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
 
     return losses / X_valid.shape[1], logits
 
