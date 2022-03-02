@@ -239,13 +239,13 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                             desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
                             total=total_batches):
         src = X_train[:, batch]
-        torch.save(src, 'src.bin')
+        # torch.save(src, 'src.bin')
         src_features = [article_features[i] for i in src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
         tgt = Y_train[:, batch]
-        tgt_features =  [article_features[np.array(i, dtype=np.int32)] for i in tgt]
+        tgt_features =  [article_features[i] for i in tgt]
         src = torch.tensor(src, dtype=torch.long).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
         src_features = torch.tensor(src_features, dtype=torch.double).to(DEVICE)
@@ -260,6 +260,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         optimizer.zero_grad()
 
         tgt_out = tgt[1:, :]
+        print("Loss, ", tgt_out.size(), logits.size())
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
 
