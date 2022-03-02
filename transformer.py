@@ -235,8 +235,9 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     indices = list(range(X_train.shape[1]))
     losses = 0
     step = 1
+    batch_loss = 0
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)),
-                            desc=f'Training epoch {epoch+1} - step {step} - loss {losses / step / batch_size}',
+                            desc=f'Training epoch {epoch+1} - step {step} - loss {batch_loss}',
                             total=total_batches):
         src = X_train[:, batch]
         # torch.save(src, 'src.bin')
@@ -260,14 +261,15 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         optimizer.zero_grad()
 
         tgt_out = tgt[1:, :]
-        print("Loss, ", tgt_out.size(), logits.size())
+        # print("Loss, ", tgt_out.size(), logits.size())
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
 
         optimizer.step()
         losses += loss.item()
+        batch_loss = loss.item() / batch_size
 
-    return losses / len(X_train)
+    return losses / X_train.shape[1]
 
 def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
     model.eval()
@@ -295,7 +297,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features):
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
 
-    return losses / len(X_valid), logits
+    return losses / X_valid.shape[1], logits
 
 
 def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
