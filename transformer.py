@@ -234,7 +234,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     total_batches = int(X_train.shape[1]/batch_size) + 1
     # print(total_batches)
     indices = list(range(X_train.shape[1]))
-    if epoch > 0:
+    if epoch >= 0:
         random.shuffle(indices)
     losses = 0
     step = 1
