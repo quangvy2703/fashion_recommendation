@@ -254,7 +254,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         tgt_features = tgt_features[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
-
+        print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
         logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
 
         optimizer.zero_grad()
