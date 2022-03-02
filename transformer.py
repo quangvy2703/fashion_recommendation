@@ -235,10 +235,11 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     indices = list(range(X_train.shape[1]))
     losses = 0
     step = 1
-    batch_loss = 0
-    for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)),
+    batch_loss = 10
+    t = tqdm(enumerate(batch_generator(indices, batch_size)),
                             desc=f'Training epoch {epoch+1} - step {step} - loss {batch_loss}',
-                            total=total_batches):
+                            total=total_batches)
+    for step, batch in t:
         src = X_train[:, batch]
         # torch.save(src, 'src.bin')
         src_features = [article_features[i] for i in src]
@@ -268,6 +269,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         optimizer.step()
         losses += loss.item()
         batch_loss = loss.item() / float(batch_size)
+        t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
 
     return losses / X_train.shape[1]
 
