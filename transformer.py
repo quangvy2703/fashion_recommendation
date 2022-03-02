@@ -372,7 +372,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         start_time = datetime.now()
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
         end_time = datetime.now()
-        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, vocab, article_features)
+        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, vocab, article_features, BATCH_SIZE, epoch)
         map12 = mean_average_precision(Y_valid, logits)
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(end_time - start_time):.3f}s"))
             # Early Stop
