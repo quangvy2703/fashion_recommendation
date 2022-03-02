@@ -267,7 +267,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
 
         optimizer.step()
         losses += loss.item()
-        batch_loss = loss.item() / batch_size
+        batch_loss = loss.item() / float(batch_size)
 
     return losses / X_train.shape[1]
 
