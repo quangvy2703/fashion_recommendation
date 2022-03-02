@@ -326,7 +326,9 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         if p.dim() > 1:
             nn.init.xavier_uniform_(p)
 
+    transformer = transformer.double()
     transformer = transformer.to(DEVICE)
+    
 
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_idx)
 
