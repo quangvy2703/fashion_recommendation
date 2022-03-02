@@ -1,6 +1,6 @@
 from ntpath import join
 import pickle
-from random import random
+import random
 from tqdm import tqdm
 from config import MAX_SEQUENCE_LENGTH
 from torch import Tensor
