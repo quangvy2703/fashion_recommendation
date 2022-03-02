@@ -234,7 +234,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     total_batches = int(X_train.shape[1]/batch_size) + 1
     # print(total_batches)
     indices = list(range(X_train.shape[1]))
-    if epoch >= 0:
+    if epoch > 0:
         random.shuffle(indices)
     losses = 0
     step = 1
@@ -245,7 +245,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     try:
         for step, batch in t:
             src = X_train[:, batch]
-            # torch.save(src, 'src.bin')
+            torch.save(src, 'src.bin')
             src_features = [article_features[i] for i in src]
             # y for teacher forcing is all sequence without a last element
             # y_tf = Y_train[batch, :-1]
