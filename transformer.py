@@ -393,6 +393,7 @@ class ArticleEmbedding(nn.Module):
         # output = output * transaction_encoder_output
         # output = self.out(output)
         # output = self.softmax(output)
+        print(tok_emb.size(), article_features.size(), output.size())
         return self.dropout(output + tok_emb)
 
 class Seq2SeqTransformer(nn.Module):
