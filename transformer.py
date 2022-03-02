@@ -231,7 +231,7 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
 def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article_features, epoch, saved_data_dir="saved_data_dir"):
     model.train()
     total_batches = int(X_train.shape[1]/batch_size) + 1
-    print(total_batches)
+    # print(total_batches)
     indices = list(range(X_train.shape[1]))
     losses = 0
     step = 1
@@ -254,7 +254,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         tgt_features = tgt_features[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
-        print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
+        # print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
         logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
 
         optimizer.zero_grad()
@@ -378,7 +378,7 @@ class TokenEmbedding(nn.Module):
         self.emb_size = emb_size
 
     def forward(self, tokens: Tensor):
-        print("Token size ", tokens.size())
+        # print("Token size ", tokens.size())
         return self.embedding(tokens.long()) * math.sqrt(self.emb_size) 
 
 
@@ -394,7 +394,7 @@ class ArticleEmbedding(nn.Module):
         # self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, tok_emb: Tensor, article_features: Tensor):
-        print(self.article_features_size, tok_emb.size(), article_features.size())
+        # print(self.article_features_size, tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
         # output = output * transaction_encoder_output
         # output = self.out(output)
@@ -437,7 +437,7 @@ class Seq2SeqTransformer(nn.Module):
                 memory_key_padding_mask: Tensor):
         src_emb = self.token_emb(src)
         tgt_emb = self.token_emb(tgt)
-        print("In S2S", src.size(), tgt.size(), src_emb.size(), tgt_emb.size())
+        # print("In S2S", src.size(), tgt.size(), src_emb.size(), tgt_emb.size())
         src_emb = self.article_emb(src_emb, src_feat)
         tgt_emb = self.article_emb(tgt_emb, tgt_feat)
         output = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, None, src_padding_mask, tgt_padding_mask, memory_key_padding_mask)
