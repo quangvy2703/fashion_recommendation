@@ -320,7 +320,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features, batch_si
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
 
         logit = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
-        logits.append(vocab.unidex_words(logit[1:-1]))
+        logits.append(vocab.unidex_articles(logit[1:-1]))
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
