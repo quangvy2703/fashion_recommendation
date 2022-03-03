@@ -310,7 +310,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
         torch.save(src, "src.bin")
     return losses / X_train.shape[1]
 
-def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features, batch_size, epoch):
+def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epoch):
     model.eval()
     losses = 0
     logits = []
@@ -338,11 +338,11 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features, batch_si
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
         tgt_features =  [article_features[i] for i in tgt]
-        src = torch.tensor(src, dtype=torch.float64).to(DEVICE)
-        tgt = torch.tensor(tgt, dtype=torch.float64).to(DEVICE)
+        src = torch.tensor(src, dtype=torch.long).to(DEVICE)
+        tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
 
-        src_features = torch.tensor(src_features, dtype=torch.float64).to(DEVICE)
-        tgt_features = torch.tensor(tgt_features, dtype=torch.float64).to(DEVICE)
+        src_features = torch.tensor(src_features, dtype=torch.long).to(DEVICE)
+        tgt_features = torch.tensor(tgt_features, dtype=torch.long).to(DEVICE)
         tgt_input = tgt[:-1, :]
         tgt_features = tgt_features[:-1, :]
 
@@ -403,7 +403,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         start_time = datetime.now()
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
         end_time = datetime.now()
-        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, vocab, article_features, BATCH_SIZE, epoch)
+        val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, epoch)
         map12 = mean_average_precision(Y_valid, logits)
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(end_time - start_time):.3f}s"))
             # Early Stop
