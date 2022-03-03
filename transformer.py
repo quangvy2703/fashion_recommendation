@@ -237,7 +237,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
 
     memory = model.encode(src, src_features, src_mask)
     ys = torch.ones(1, src.size(1)).fill_(start_symbol).type(torch.long).to(DEVICE)
-    ys_features = torch.zeros(src_features.size(2), src.size(1)).to(DEVICE)
+    ys_features = torch.zeros(1, src.size(1), src_features.size(2)).to(DEVICE)
     print("In greedy ",  ys_features.size())
     
     for i in range(max_len-1):
@@ -253,7 +253,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
         ys = torch.cat([ys,
                         torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
         ys_features = torch.cat([ys_features,
-                        torch.ones(len(src_features[0]), src.size(1)).type_as(ys_features.data).fill_(article_features[next_word])], dim=0)       
+                        torch.ones(src.size(1), src_features.size(2)).type_as(ys_features.data).fill_(article_features[next_word])], dim=0)       
         if next_word == EOS_IDX:
             break
     return ys
