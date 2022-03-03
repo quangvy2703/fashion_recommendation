@@ -369,7 +369,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     # torch.save(article_features, "article_features.bin")
     EMB_SIZE = 512
-    NHEAD = 4
+    NHEAD = 8
     FFN_HID_DIM = 512
     BATCH_SIZE = 128
     NUM_ENCODER_LAYERS = 3
@@ -395,7 +395,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_idx)
 
-    optimizer = torch.optim.Adam(transformer.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
+    optimizer = torch.optim.Adam(transformer.parameters(), lr=cfg["LR"], betas=(0.9, 0.98), eps=1e-9)
     for epoch in range(N_EPOCHS):
         start_time = datetime.now()
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
