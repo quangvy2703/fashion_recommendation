@@ -339,8 +339,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
         tgt_features =  [article_features[i] for i in tgt]
-        src = torch.tensor(src, dtype=torch.long).to(DEVICE)
-        tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
+        src = torch.tensor(src, dtype=torch.float).to(DEVICE)
+        tgt = torch.tensor(tgt, dtype=torch.float).to(DEVICE)
 
         src_features = torch.tensor(src_features, dtype=torch.float).to(DEVICE)
         tgt_features = torch.tensor(tgt_features, dtype=torch.float).to(DEVICE)
