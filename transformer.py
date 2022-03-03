@@ -237,7 +237,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
 
     memory = model.encode(src, src_features, src_mask)
     ys = torch.ones(1, src.size(1)).fill_(start_symbol).type(torch.long).to(DEVICE)
-    ys_features = torch.zeros(len(src_features[0]), src.size(1)).to(DEVICE)
+    ys_features = torch.zeros(src_features.size(1), src.size(1)).to(DEVICE)
     print("In greedy ", ys_features.size())
     
     for i in range(max_len-1):
