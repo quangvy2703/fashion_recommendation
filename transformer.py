@@ -333,23 +333,21 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # y for loss calculation is all sequence without a last element
         tgt = Y_valid[:, batch]
         # torch.save(tgt, 'tgt.bin')
-        
-        src_features =  [article_features[i] for i in src]
         # y for teacher forcing is all sequence without a last element
         # y_tf = Y_train[batch, :-1]
         # y for loss calculation is all sequence without a last element
         tgt_features =  [article_features[i] for i in tgt]
+
         src = torch.tensor(src, dtype=torch.long).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
-
         src_features = torch.tensor(src_features, dtype=torch.double).to(DEVICE)
         tgt_features = torch.tensor(tgt_features, dtype=torch.double).to(DEVICE)
+
         tgt_input = tgt[:-1, :]
         tgt_features = tgt_features[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
-
-        logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
+        logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
         
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
@@ -461,7 +459,7 @@ class ArticleEmbedding(nn.Module):
 
     def forward(self, tok_emb: Tensor, article_features: Tensor):
         # print(self.article_features_size, tok_emb.size(), article_features.size())
-        output = self.article_emb(article_features.type(torch.float))
+        output = self.article_emb(article_features)
         # output = output * transaction_encoder_output
         # output = self.out(output)
         # output = self.softmax(output)
@@ -517,7 +515,7 @@ class Seq2SeqTransformer(nn.Module):
         return output
 
     def decode(self, tgt: Tensor, tgt_features: Tensor, memory: Tensor, tgt_mask: Tensor):
-        output = self.token_emb(tgt).type(torch.float)
+        output = self.token_emb(tgt)
         output = self.transformer.decoder(self.article_emb(output, tgt_features), memory, tgt_mask)
         return output
 
