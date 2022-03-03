@@ -229,6 +229,35 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
 
     return X_train, Y_train, X_valid, Y_valid
 
+
+# function to generate output sequence using greedy algorithm
+def greedy_decode(model, src, src_features, src_mask, article_features, max_len, start_symbol):
+    src = src.to(DEVICE)
+    src_mask = src_mask.to(DEVICE)
+
+    memory = model.encode(src, src_features, src_mask)
+    ys = torch.ones(1, src.size(1)).fill_(start_symbol).type(torch.long).to(DEVICE)
+    ys_features = torch.zeros(len(src_features[0]), src.size(1))
+    
+    for i in range(max_len-1):
+        memory = memory.to(DEVICE)
+        tgt_mask = (generate_square_subsequent_mask(ys.size(0))
+                    .type(torch.bool)).to(DEVICE)
+        out = model.decode(ys, ys_features, memory, tgt_mask)
+        out = out.transpose(0, 1)
+        prob = model.generator(out[:, -1])
+        _, next_word = torch.max(prob, dim=1)
+        next_word = next_word.item()
+
+        ys = torch.cat([ys,
+                        torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
+        ys_features = torch.cat([ys_features,
+                        torch.ones(len(src_features[0]), src.size(1)).type_as(ys_features.data).fill_(article_features[next_word])], dim=0)       
+        if next_word == EOS_IDX:
+            break
+    return ys
+
+    
 def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article_features, epoch, saved_data_dir="saved_data_dir"):
     model.train()
     total_batches = int(X_train.shape[1]/batch_size) + 1
@@ -288,12 +317,12 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features, batch_si
     total_batches = int(X_valid.shape[1]/batch_size) + 1
     indices = list(range(X_valid.shape[1]))
     step = 1
-    batch_loss = 10
+    batch_loss = 0
 
     t = tqdm(enumerate(batch_generator(indices, batch_size)),
                             desc=f'Training epoch {epoch+1} - step {step} - loss {batch_loss}',
                             total=total_batches)
-
+    predicted = []
     for step, batch in t:
         src = X_valid[:, batch]
         # torch.save(src, 'src.bin')
@@ -319,12 +348,14 @@ def evaluate(model, loss_fn, X_valid, Y_valid, vocab, article_features, batch_si
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
 
-        logit = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
-        logits.append(vocab.unidex_articles(logit[1:-1]))
+        logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
+        
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
         batch_loss = loss.item() / float(batch_size)
+        tgt_tokens = greedy_decode(model, src, src_mask, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
+        predicted += tgt_tokens
         t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
 
     return losses / X_valid.shape[1], logits
@@ -454,6 +485,7 @@ class Seq2SeqTransformer(nn.Module):
                                         dim_feedforward=dim_feedforward,
                                         dropout=dropout)
         self.generator = nn.Linear(emb_size, n_articles)
+        self.softmax = nn.Softmax(dim=1)
         self.token_emb = TokenEmbedding(n_articles, emb_size)
         # self.src_tok_emb = TokenEmbedding(n_articles, emb_size)
         # self.tgt_tok_emb = TokenEmbedding(n_articles, emb_size)
@@ -476,13 +508,14 @@ class Seq2SeqTransformer(nn.Module):
         tgt_emb = self.article_emb(tgt_emb, tgt_feat)
         output = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, None, src_padding_mask, tgt_padding_mask, memory_key_padding_mask)
         output = self.generator(output)
+        output = self.softmax(output)
         return output
 
-    def encode(self, src: Tensor, src_mask: Tensor):
-        output = self.transformer.encoder(self.article_emb(self.token_emb(src)), src_mask)
+    def encode(self, src: Tensor, src_features: Tensor, src_mask: Tensor):
+        output = self.transformer.encoder(self.article_emb(self.token_emb(src), src_features), src_mask)
         return output
 
-    def decode(self, tgt: Tensor, memory: Tensor, tgt_mask: Tensor):
-        output = self.transformer.decoder(self.article_emb(self.token_emb(tgt)), memory, tgt_mask)
+    def decode(self, tgt: Tensor, tgt_features: Tensor, memory: Tensor, tgt_mask: Tensor):
+        output = self.transformer.decoder(self.article_emb(self.token_emb(tgt), tgt_features), memory, tgt_mask)
         return output
 
