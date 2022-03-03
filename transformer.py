@@ -272,8 +272,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                         total=total_batches)
     try:
         for step, batch in t:
-            if step < 5258:
-                continue
+            # if step < 5258:
+            #     continue
             src = X_train[:, batch]
             # torch.save(src, 'src.bin')
             src_features = [article_features[i] for i in src]
@@ -353,7 +353,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         batch_loss = loss.item() / float(batch_size)
         # tgt_tokens = greedy_decode(model, src, src_features, src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
         # predicted += tgt_tokens
-        t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
+        t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
 
     return losses / X_valid.shape[1], logits
 
@@ -399,11 +399,12 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     for epoch in range(N_EPOCHS):
         start_time = datetime.now()
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
-        end_time = datetime.now()
+        
         val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, epoch)
         # map12 = mean_average_precision(Y_valid, logits)
         map12 = 0
-        print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(end_time - start_time):.3f}s"))
+        end_time = datetime.now()
+        print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(str(end_time - start_time)):.3f}s"))
             # Early Stop
         # if map12 > best_score:
         #     early_stop_counter = 0
