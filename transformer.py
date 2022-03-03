@@ -368,12 +368,12 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     article_features = np.array(vocab.article_features, dtype=np.double)
 
     # torch.save(article_features, "article_features.bin")
-    EMB_SIZE = 512
-    NHEAD = 8
+    EMB_SIZE = cfg["HIDDEN_SIZE"]
+    NHEAD = cfg["N_HEADS"]
     FFN_HID_DIM = 512
     BATCH_SIZE = 128
-    NUM_ENCODER_LAYERS = 3
-    NUM_DECODER_LAYERS = 3
+    NUM_ENCODER_LAYERS = cfg["N_LAYERS"]
+    NUM_DECODER_LAYERS = cfg["N_LAYERS"]
     N_EPOCHS = 100
 
     best_score = 0.0
