@@ -353,7 +353,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
         batch_loss = loss.item() / float(batch_size)
-        tgt_tokens = greedy_decode(model, src, src_features.type(torch.long), src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
+        tgt_tokens = greedy_decode(model, src, src_features.type(torch.float), src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
         predicted += tgt_tokens
         t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
 
