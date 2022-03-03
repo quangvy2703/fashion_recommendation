@@ -507,7 +507,7 @@ class Seq2SeqTransformer(nn.Module):
         tgt_emb = self.article_emb(tgt_emb, tgt_feat)
         output = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, None, src_padding_mask, tgt_padding_mask, memory_key_padding_mask)
         output = self.generator(output)
-        output = self.softmax(output)
+        # output = self.softmax(output)
         return output
 
     def encode(self, src: Tensor, src_features: Tensor, src_mask: Tensor):
