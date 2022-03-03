@@ -404,7 +404,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         # map12 = mean_average_precision(Y_valid, logits)
         map12 = 0
         end_time = datetime.now()
-        print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(str(end_time - start_time)):.3f}s"))
+        print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12}"))
             # Early Stop
         # if map12 > best_score:
         #     early_stop_counter = 0
