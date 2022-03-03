@@ -242,16 +242,14 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
     
     for i in range(max_len-1):
         memory = memory.to(DEVICE)
-        tgt_mask = (generate_square_subsequent_mask(ys.size(0))
-                    .type(torch.bool)).to(DEVICE)
-        out = model.decode(ys, ys_features, memory, tgt_mask)
+        tgt_mask = (generate_square_subsequent_mask(ys.size(0)).type(torch.bool)).to(DEVICE)
+        out = model.decode(src, src_features, memory, tgt_mask)
         out = out.transpose(0, 1)
         prob = model.generator(out[:, -1])
         _, next_word = torch.max(prob, dim=1)
         next_word = next_word.item()
 
-        ys = torch.cat([ys,
-                        torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
+        ys = torch.cat([ys, torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
         ys_features = torch.cat([ys_features,
                         torch.ones(src.size(1), src_features.size(2)).type_as(ys_features.data).fill_(article_features[next_word])], dim=0)       
         if next_word == EOS_IDX:
