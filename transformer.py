@@ -342,8 +342,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         src = torch.tensor(src, dtype=torch.long).to(DEVICE)
         tgt = torch.tensor(tgt, dtype=torch.long).to(DEVICE)
 
-        src_features = torch.tensor(src_features, dtype=torch.double).to(DEVICE)
-        tgt_features = torch.tensor(tgt_features, dtype=torch.double).to(DEVICE)
+        src_features = torch.tensor(src_features, dtype=torch.float).to(DEVICE)
+        tgt_features = torch.tensor(tgt_features, dtype=torch.float).to(DEVICE)
         tgt_input = tgt[:-1, :]
         tgt_features = tgt_features[:-1, :]
 
