@@ -516,6 +516,7 @@ class Seq2SeqTransformer(nn.Module):
         return output
 
     def decode(self, tgt: Tensor, tgt_features: Tensor, memory: Tensor, tgt_mask: Tensor):
+        print(self.token_emb(tgt).size(), tgt_features.size())
         output = self.transformer.decoder(self.article_emb(self.token_emb(tgt), tgt_features), memory, tgt_mask)
         return output
 
