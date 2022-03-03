@@ -351,8 +351,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
         batch_loss = loss.item() / float(batch_size)
-        tgt_tokens = greedy_decode(model, src, src_features, src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
-        predicted += tgt_tokens
+        # tgt_tokens = greedy_decode(model, src, src_features, src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
+        # predicted += tgt_tokens
         t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
 
     return losses / X_valid.shape[1], logits
@@ -401,21 +401,22 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
         end_time = datetime.now()
         val_loss, logits = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, epoch)
-        map12 = mean_average_precision(Y_valid, logits)
+        # map12 = mean_average_precision(Y_valid, logits)
+        map12 = 0
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map12} "f"Epoch time = {(end_time - start_time):.3f}s"))
             # Early Stop
-        if map12 > best_score:
-            early_stop_counter = 0
-            print('The best model is found, resetting early stop counter.')
-            best_score = map12
-            best_model = transformer
-        else:
-            early_stop_counter += 1
-            print('No improvements for {} epochs.'.format(early_stop_counter))
-            if early_stop_counter >= early_stop_after:
-                print('Early stop!')
-                torch.save(best_model, os.path.join(saved_data_dir, 'best_epoch.pth'))
-                break    
+        # if map12 > best_score:
+        #     early_stop_counter = 0
+        #     print('The best model is found, resetting early stop counter.')
+        #     best_score = map12
+        #     best_model = transformer
+        # else:
+        #     early_stop_counter += 1
+        #     print('No improvements for {} epochs.'.format(early_stop_counter))
+        #     if early_stop_counter >= early_stop_after:
+        #         print('Early stop!')
+        #         torch.save(best_model, os.path.join(saved_data_dir, 'best_epoch.pth'))
+        #         break    
 
 class CustomerEmbedding(nn.Module):
     def __init__(self, input_size, emb_size):
