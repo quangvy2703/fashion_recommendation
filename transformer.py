@@ -461,7 +461,7 @@ class ArticleEmbedding(nn.Module):
 
     def forward(self, tok_emb: Tensor, article_features: Tensor):
         # print(self.article_features_size, tok_emb.size(), article_features.size())
-        output = self.article_emb(article_features)
+        output = self.article_emb(article_features.type(torch.float))
         # output = output * transaction_encoder_output
         # output = self.out(output)
         # output = self.softmax(output)
