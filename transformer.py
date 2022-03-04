@@ -64,6 +64,7 @@ class Vocab:
         self.article_features_size = article_features_len
         for i in [SOS_token, EOS_token, UNK_token, PAD_token]:
             self.article_features[i] = [0] * article_features_len
+        print(self.article_features)
         article_features = []
         # print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
         for article_index in self.index2article.keys():
