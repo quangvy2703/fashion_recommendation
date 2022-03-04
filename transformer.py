@@ -47,7 +47,7 @@ class Vocab:
     def index_articles(self, articles):
         for article in articles:
             self.index_article(article)
-        pickle.dump(self.index2article, open('self.index2article.pkl', 'wb'))
+        
 
     def index_article(self, article):
         global VOCAB_SIZE
@@ -154,6 +154,8 @@ def read_vocab(source, target):
 
     for tran in tqdm(target, "Reading vocab for target"):
         vocab.index_articles(tran)
+
+    pickle.dump(vocab.index2article, open('self.index2article.pkl', 'wb'))
     return vocab
 
  
