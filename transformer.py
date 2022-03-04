@@ -189,7 +189,7 @@ def batch_generator(batch_indices, batch_size):
 def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     max_seq_length = MAX_SEQUENCE_LENGTH + 2
     transactions = pickle.load(open(data_dir + '/customer_sequences.pkl', 'rb'))
-    customer_ids, source, target = preprocess_corpus(transactions, 1)
+    customer_ids, source, target = preprocess_corpus(transactions, 3)
     vocab = read_vocab(source, target)
     vocab.to_file(os.path.join(save_data_dir, 'vocab.txt'))
     global VOCAB_SIZE
@@ -473,14 +473,14 @@ class ArticleEmbedding(nn.Module):
         self.article_features_size = article_features_size
         self.article_emb = nn.Linear(article_features_size, self.emb_size)
         # self.dropout = nn.Dropout(dropout)
-        self.out = nn.Linear(self.emb_size, self.emb_size)
+        # self.out = nn.Linear(self.emb_size, self.emb_size)
         # self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, tok_emb: Tensor, article_features: Tensor):
         # print(self.article_features_size, tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
         # output = output * transaction_encoder_output
-        output = self.out(output)
+        # output = self.out(output)
         # output = self.softmax(output)
         
         return output + tok_emb
@@ -508,7 +508,7 @@ class Seq2SeqTransformer(nn.Module):
         # self.src_tok_emb = TokenEmbedding(n_articles, emb_size)
         # self.tgt_tok_emb = TokenEmbedding(n_articles, emb_size)
         self.article_emb = ArticleEmbedding(article_feature_dim, emb_size)
-        self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
+        # self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
 
     def forward(self, 
                 src: Tensor,
@@ -523,10 +523,10 @@ class Seq2SeqTransformer(nn.Module):
         src_emb = self.token_emb(src)
         tgt_emb = self.token_emb(tgt)
         # print("In S2S", src.size(), tgt.size(), src_emb.size(), tgt_emb.size())
-        # src_emb = self.article_emb(src_emb, src_feat)
-        # tgt_emb = self.article_emb(tgt_emb, tgt_feat)
-        src_emb = self.positional_encoding(src_emb)
-        tgt_emb = self.positional_encoding(tgt_emb)
+        src_emb = self.article_emb(src_emb, src_feat)
+        tgt_emb = self.article_emb(tgt_emb, tgt_feat)
+        # src_emb = self.positional_encoding(src_emb)
+        # tgt_emb = self.positional_encoding(tgt_emb)
         output = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, None, src_padding_mask, tgt_padding_mask, memory_key_padding_mask)
         output = self.generator(output)
         # output = self.softmax(output)
