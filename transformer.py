@@ -65,14 +65,15 @@ class Vocab:
         self.article_features_size = article_features_len
         for i in [SOS_token, EOS_token, UNK_token, PAD_token]:
             article_features[i] = [0] * article_features_len
+        pickle.dump(article_features, open('article_features.pkl', 'wb'))
         # print(self.article_features.keys())
         self.article_features = []
         # print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
         for article_index in self.index2article.keys():
             article_id = self.index2article[article_index]
             print(article_id)
-            # if article_id not in [SOS_token, EOS_token, UNK_token, PAD_token]:
-            #     article_id = int(article_id)
+            if article_id not in [SOS_token, EOS_token, UNK_token, PAD_token]:
+                article_id = int(article_id)
             self.article_features.append(article_features[article_id])
 
 
