@@ -448,23 +448,23 @@ class TokenEmbedding(nn.Module):
 
 
 class ArticleEmbedding(nn.Module):
-    def __init__(self, article_features_size, emb_size, dropout=0.1):
+    def __init__(self, article_features_size, emb_size):
         super(ArticleEmbedding, self).__init__()
         self.emb_size = emb_size
         self.article_features_size = article_features_size
         self.article_emb = nn.Linear(article_features_size, self.emb_size)
-        self.dropout = nn.Dropout(dropout)
-        # self.out = nn.Linear(hidden_size, hidden_size)
+        # self.dropout = nn.Dropout(dropout)
+        self.out = nn.Linear(self.emb_size, self.emb_size)
         # self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, tok_emb: Tensor, article_features: Tensor):
         # print(self.article_features_size, tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
         # output = output * transaction_encoder_output
-        # output = self.out(output)
+        output = self.out(output)
         # output = self.softmax(output)
         
-        return self.dropout(output + tok_emb)
+        return output + tok_emb
 
 class Seq2SeqTransformer(nn.Module):
     def __init__(self,
