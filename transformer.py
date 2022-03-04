@@ -94,7 +94,7 @@ class Vocab:
         return [self.index2article[i] for i in indices]
 
     def to_file(self, filename):
-        values = [str(w) for w, k in sorted(list(self.article2index.items())[0:])]
+        values = [str(w) for w, k in sorted(list(self.article2index.items())[4:])]
         with open(filename, 'w') as f:
             f.write('\n'.join(values))
 
