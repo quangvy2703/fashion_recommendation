@@ -508,7 +508,7 @@ class Seq2SeqTransformer(nn.Module):
         # self.src_tok_emb = TokenEmbedding(n_articles, emb_size)
         # self.tgt_tok_emb = TokenEmbedding(n_articles, emb_size)
         self.article_emb = ArticleEmbedding(article_feature_dim, emb_size)
-        self.position_encoding = PositionalEncoding(emb_size, dropout=dropout)
+        self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
 
     def forward(self, 
                 src: Tensor,
