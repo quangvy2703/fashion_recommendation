@@ -64,7 +64,7 @@ class Vocab:
         self.article_features_size = article_features_len
         for i in [SOS_token, EOS_token, UNK_token, PAD_token]:
             self.article_features[i] = [0] * article_features_len
-        print(self.article_features.keys())
+        # print(self.article_features.keys())
         article_features = []
         # print(f"Len of ia {len(self.index2article.keys())}, len of af {len(self.article_features.keys())}")
         for article_index in self.index2article.keys():
@@ -190,7 +190,7 @@ def batch_generator(batch_indices, batch_size):
 def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     max_seq_length = MAX_SEQUENCE_LENGTH + 2
     transactions = pickle.load(open(data_dir + '/customer_sequences.pkl', 'rb'))
-    customer_ids, source, target = preprocess_corpus(transactions, 3)
+    customer_ids, source, target = preprocess_corpus(transactions, 1)
     vocab = read_vocab(source, target)
     vocab.to_file(os.path.join(save_data_dir, 'vocab.txt'))
     global VOCAB_SIZE
