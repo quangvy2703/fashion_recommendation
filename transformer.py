@@ -47,7 +47,7 @@ class Vocab:
     def index_articles(self, articles):
         for article in articles:
             self.index_article(article)
-        pickle.dump(self.index2article, open('self.index2article.pkl', 'rb'))
+        pickle.dump(self.index2article, open('self.index2article.pkl', 'wb'))
 
     def index_article(self, article):
         global VOCAB_SIZE
