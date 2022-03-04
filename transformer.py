@@ -72,8 +72,8 @@ class Vocab:
             print(article_id)
             # if article_id not in [SOS_token, EOS_token, UNK_token, PAD_token]:
             #     article_id = int(article_id)
-            article_features.append(self.article_features[article_id])
-        self.article_features = article_features
+            self.article_features.append(article_features[article_id])
+
 
     def index_article_features(self, index):
         article_id = self.index2article(index)
