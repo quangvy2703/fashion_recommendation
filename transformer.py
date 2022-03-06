@@ -297,7 +297,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
             tgt_input = tgt[:-1, :]
             tgt_features = tgt_features[:-1, :]
 
-            src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
+            # src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
             # print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
             logits = model(src, tgt_input, src_features, tgt_features, None, None, None, None, None)
             # logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
@@ -351,9 +351,9 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         tgt_input = tgt[:-1, :]
         tgt_features = tgt_features[:-1, :]
 
-        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
-        logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
-        
+        # src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
+        # logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
+        logits = model(src, tgt_input, src_features, tgt_features, None, None, None, None, None)
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
@@ -361,7 +361,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # tgt_tokens = greedy_decode(model, src, src_features, src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
-
+    torch.save(logits, "logits.bin")
     return losses / X_valid.shape[1], logits
 
 
@@ -475,13 +475,13 @@ class PositionalEncoding(nn.Module):
 
 
 class ArticleEmbedding(nn.Module):
-    def __init__(self, article_features_size, emb_size):
+    def __init__(self, article_features_size, emb_size, dropout=0.5):
         super(ArticleEmbedding, self).__init__()
         self.emb_size = emb_size
         self.article_features_size = article_features_size
         self.article_emb = nn.Linear(article_features_size, self.emb_size * 2)
         self.out = nn.Linear(self.emb_size * 2, self.emb_size)
-        # self.dropout = nn.Dropout(dropout)
+        self.dropout = nn.Dropout(dropout=dropout)
         # self.out = nn.Linear(self.emb_size, self.emb_size)
         # self.softmax = nn.LogSoftmax(dim=1)
 
@@ -489,6 +489,7 @@ class ArticleEmbedding(nn.Module):
         # print(self.article_features_size, tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
         output = self.out(output)
+        output = self.dropout(output)
         # output = output * transaction_encoder_output
         # output = self.out(output)
         # output = self.softmax(output)
