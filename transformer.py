@@ -373,8 +373,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
     maps = []
-    for predict, target in zip(predicted, targets):
-        map = mean_average_precision(target, predict, k=11)
+    for i in range(len(predicted.shape[1])):
+        map = mean_average_precision(targets[:, i], predicted[:, i], k=11)
         maps = maps.append(map)
     
     return losses / X_valid.shape[1], np.mean(maps)
