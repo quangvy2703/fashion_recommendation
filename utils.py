@@ -94,7 +94,7 @@ def average_precision_at_k(y_true, y_pred, k=12):
     """
     ap = 0.0
     for i in range(1, k+1):
-        print(i)
+        print(i, y_true, y_pred)
         ap += precision_at_k(y_true, y_pred, i) * rel_at_k(y_true, y_pred, i)
         
     return ap / min(k, len(y_true))
