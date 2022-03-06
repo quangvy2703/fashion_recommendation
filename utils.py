@@ -50,7 +50,7 @@ def precision_at_k(y_true, y_pred, k=12):
     score: double
            Precision at k
     """
-    intersection = np.intersect1d(y_true, y_pred[:k])
+    intersection = np.intersect1d(y_true, y_pred)
     return len(intersection) / k
 
 def rel_at_k(y_true, y_pred, k=12):
