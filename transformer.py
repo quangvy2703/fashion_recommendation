@@ -372,11 +372,10 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # tgt_tokens = greedy_decode(model, src, src_features, src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
-    maps = []
     map = mean_average_precision(np.transpose(targets), np.transpose(predicted), k=11)
-    maps = maps.append(map)
     
-    return losses / X_valid.shape[1], np.mean(maps)
+    
+    return losses / X_valid.shape[1], map
 
 
 def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
