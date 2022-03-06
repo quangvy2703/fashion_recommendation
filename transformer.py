@@ -196,7 +196,7 @@ def batch_generator(batch_indices, batch_size):
 def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     max_seq_length = MAX_SEQUENCE_LENGTH + 2
     transactions = pickle.load(open(data_dir + '/customer_sequences.pkl', 'rb'))
-    customer_ids, source, target = preprocess_corpus(transactions, 3)
+    customer_ids, source, target = preprocess_corpus(transactions, 1)
     vocab = read_vocab(source, target)
     vocab.to_file(os.path.join(save_data_dir, 'vocab.txt'))
     global VOCAB_SIZE
