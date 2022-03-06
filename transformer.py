@@ -134,9 +134,9 @@ def preprocess_corpus(trans, min_article_count):
         for session in sessions:
             session = [art if n_articles[art] >= min_article_count else UNK_token for art in session]
             if len(session) > max_length:
-                session = session[-12: ]
+                session = session[-12: ]           
+
             # trans[customer_id][idx] = session
-            tran.append(session)
         cus_ids.extend([customer_id] * (len(tran) - 1))
         source_trans.extend(tran[:-1])
         target_trans.extend(tran[1:])
@@ -269,8 +269,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     total_batches = int(X_train.shape[1]/batch_size) + 1
     # print(total_batches)
     indices = list(range(X_train.shape[1]))
-    # if epoch > 0:
-    #     random.shuffle(indices)
+    if epoch > 0:
+        random.shuffle(indices)
     losses = 0
     step = 1
     batch_loss = 10
@@ -299,8 +299,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
 
             src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
             # print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
-            logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
-
+            logits = model(src, tgt_input, src_features, tgt_features, None, None, None, None, None)
+            # logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
             optimizer.zero_grad()
 
             tgt_out = tgt[1:, :]
@@ -479,7 +479,8 @@ class ArticleEmbedding(nn.Module):
         super(ArticleEmbedding, self).__init__()
         self.emb_size = emb_size
         self.article_features_size = article_features_size
-        self.article_emb = nn.Linear(article_features_size, self.emb_size)
+        self.article_emb = nn.Linear(article_features_size, self.emb_size * 2)
+        self.out = nn.Linear(self.emb_size * 2, self.emb_size)
         # self.dropout = nn.Dropout(dropout)
         # self.out = nn.Linear(self.emb_size, self.emb_size)
         # self.softmax = nn.LogSoftmax(dim=1)
@@ -487,6 +488,7 @@ class ArticleEmbedding(nn.Module):
     def forward(self, tok_emb: Tensor, article_features: Tensor):
         # print(self.article_features_size, tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
+        output = self.out(output)
         # output = output * transaction_encoder_output
         # output = self.out(output)
         # output = self.softmax(output)
@@ -536,8 +538,7 @@ class Seq2SeqTransformer(nn.Module):
         # src_emb = self.positional_encoding(src_emb)
         # tgt_emb = self.positional_encoding(tgt_emb)
         output = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, None, src_padding_mask, tgt_padding_mask, memory_key_padding_mask)
-        output = self.generator(output)
-        
+        output = self.generator(output)    
         # output = self.softmax(output)
         return output
 
