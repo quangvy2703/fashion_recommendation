@@ -331,6 +331,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
     predicted = []
     targets = []
     for step, batch in t:
+        if step < 1300:
+            continue
         src = X_valid[:, batch]
         # torch.save(src, 'src.bin')
         src_features = [article_features[i] for i in src]
@@ -373,7 +375,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
     maps = []
     for predict, target in zip(predicted, targets):
         map = mean_average_precision(target, predict)
-        maps.append(map)
+        maps = maps.append(map)
     
     return losses / X_valid.shape[1], np.mean(maps)
 
