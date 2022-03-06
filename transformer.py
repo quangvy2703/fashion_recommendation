@@ -135,7 +135,7 @@ def preprocess_corpus(trans, min_article_count):
             session = [art if n_articles[art] >= min_article_count else UNK_token for art in session]
             if len(session) > max_length:
                 session = session[-12: ]           
-
+            tran.append(session)
             # trans[customer_id][idx] = session
         cus_ids.extend([customer_id] * (len(tran) - 1))
         source_trans.extend(tran[:-1])
