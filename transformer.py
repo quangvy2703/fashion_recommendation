@@ -481,7 +481,7 @@ class ArticleEmbedding(nn.Module):
         self.article_features_size = article_features_size
         self.article_emb = nn.Linear(article_features_size, self.emb_size * 2)
         self.out = nn.Linear(self.emb_size * 2, self.emb_size)
-        self.dropout = nn.Dropout(dropout=dropout)
+        # self.dropout = nn.Dropout(dropout=dropout)
         # self.out = nn.Linear(self.emb_size, self.emb_size)
         # self.softmax = nn.LogSoftmax(dim=1)
 
@@ -489,7 +489,7 @@ class ArticleEmbedding(nn.Module):
         # print(self.article_features_size, tok_emb.size(), article_features.size())
         output = self.article_emb(article_features)
         output = self.out(output)
-        output = self.dropout(output)
+        # output = self.dropout(output)
         # output = output * transaction_encoder_output
         # output = self.out(output)
         # output = self.softmax(output)
