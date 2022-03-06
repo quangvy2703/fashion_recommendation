@@ -363,10 +363,10 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         prd_out = prd_out.cpu().numpy()
         if len(predicted) == 0:
             predicted = prd_out
-            targets = tgt_out
+            targets = tgt_out.cpu().numpy()
         else:
             predicted = np.append(predicted, prd_out, axis=1)
-            targets = np.append(targets, tgt_out)
+            targets = np.append(targets, tgt_out.cpu().numpy(), axis=1)
         # tgt_tokens = greedy_decode(model, src, src_features, src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
