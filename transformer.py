@@ -423,6 +423,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, epoch)
 
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map}"))
+        torch.save(best_model, os.path.join(saved_data_dir, f'model_epoch{epoch}.pth'))
             # Early Stop
         # if map12 > best_score:
         #     early_stop_counter = 0
