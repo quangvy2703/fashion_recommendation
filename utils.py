@@ -72,9 +72,9 @@ def rel_at_k(y_true, y_pred, k=12):
     """
 
     if y_pred[k-1] in y_true:
-        return 1
+        return 1, y_pred[k-1]
     else:
-        return 0
+        return 0, 0
 
 def average_precision_at_k(y_true, y_pred, k=12):
     """ Computes Average Precision at k for one sample
@@ -99,9 +99,9 @@ def average_precision_at_k(y_true, y_pred, k=12):
     y_true_clone = y_true.copy()
     for i in range(1, k+1):
         # print(i, y_true, y_pred)
-        res = precision_at_k(y_true, y_pred, i) * rel_at_k(y_true_clone, y_pred, i)
+        res, rem = precision_at_k(y_true, y_pred, i) * rel_at_k(y_true_clone, y_pred, i)
         if res == 1:
-            y_true_clone = np.delete(y_true_clone, k-1)
+            y_true_clone = y_true_clone[y_true_clone != rem]
         ap = ap + res
     return ap / min(k, len(y_true))
 

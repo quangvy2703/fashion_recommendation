@@ -134,7 +134,7 @@ def preprocess_corpus(trans, min_article_count):
         for session in sessions:
             session = [art if n_articles[art] >= min_article_count else UNK_token for art in session]
             if len(session) > max_length:
-                session = session[-12: ]           
+                session = session[-max_length: ]           
             tran.append(session)
             # trans[customer_id][idx] = session
         cus_ids.extend([customer_id] * (len(tran) - 1))
@@ -146,6 +146,36 @@ def preprocess_corpus(trans, min_article_count):
     assert len(source_trans) == len(cus_ids), "The number of customer ids is not match!!!"
     print(f"Keep {filtered} articles from {total} articles")
     print(f"Preprocessing corpus done with {len(source_trans)} corpus")
+
+    return cus_ids, source_trans, target_trans
+
+def preprocess_test(trans, vocab):
+    n_articles = {}
+
+    cus_ids = []
+    source_trans = []
+    target_trans = []
+    customer_ids = trans.keys()
+
+    for customer_id in tqdm(customer_ids, desc="Removing rare articles..."):
+        sessions = trans[customer_id]
+        tran = []
+        for session in sessions:
+            session = [art if art in vocab.article2index.keys() else UNK_token for art in session]
+            if len(session) > max_length:
+                session = session[-max_length: ]           
+            tran.append(session)
+            # trans[customer_id][idx] = session
+        cus_ids.extend([customer_id] * (len(tran) - 1))
+        source_trans.extend(tran[:-1])
+        target_trans.extend(tran[1:])
+    total = len(n_articles.keys())
+    filtered = len(set(np.hstack(np.append(source_trans, target_trans))))
+    assert len(source_trans) == len(target_trans), "Source and Target must match in size!!!"
+    assert len(source_trans) == len(cus_ids), "The number of customer ids is not match!!!"
+    print(f"Keep {filtered} articles from {total} articles")
+    print(f"Preprocessing corpus done with {len(source_trans)} corpus")
+
     return cus_ids, source_trans, target_trans
 
 
@@ -200,6 +230,49 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
     vocab = read_vocab(source, target)
     vocab.to_file(os.path.join(save_data_dir, 'vocab.txt'))
     global VOCAB_SIZE
+    VOCAB_SIZE = len(vocab.article2index)
+    print('Corpus length: {}\nVocabulary size: {}'.format(
+        len(source), len(vocab.article2index)))
+
+    X_train, X_valid, Y_train, Y_valid = train_test_split(source, target, test_size=0.2, random_state=42)
+
+    # customer_id_train = X_train[:, 1]
+    # X_train = X_train[:, 0]
+    # customer_id_valid = X_valid[:, 1]
+    # X_valid = X_valid[:, 0]
+
+    training_pairs = []
+    for source_session, target_session in zip(X_train, Y_train):
+        training_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))
+    
+    X_train, Y_train = zip(*training_pairs)
+    X_train = torch.cat(X_train, dim=-1)
+    Y_train = torch.cat(Y_train, dim=-1)
+    torch.save(X_train, os.path.join(save_data_dir, 'X_train.bin'))
+    torch.save(Y_train, os.path.join(save_data_dir, 'Y_train.bin'))
+    # torch.save(customer_id_train, os.path.join(save_data_dir, 'customer_ids_train.bin'))
+
+    valid_pairs = []
+    for source_session, target_session in zip(X_valid, Y_valid):
+        valid_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))      
+
+    X_valid, Y_valid = zip(*valid_pairs)
+    X_valid = torch.cat(X_valid, dim=-1)
+    Y_valid = torch.cat(Y_valid, dim=-1)
+    torch.save(X_valid, os.path.join(save_data_dir, 'X_valid.bin'))
+    torch.save(Y_valid, os.path.join(save_data_dir, 'Y_valid.bin'))
+    # torch.save(customer_id_valid, os.path.join(save_data_dir, 'customer_ids_valid.bin'))
+
+
+    return X_train, Y_train, X_valid, Y_valid
+
+
+def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"):
+    max_seq_length = MAX_SEQUENCE_LENGTH + 2
+    transactions = pickle.load(open(data_dir + '/customer_sequences_submission.pkl', 'rb'))
+    vocab = Vocab()
+    vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
+    customer_ids, source, target = preprocess_test(transactions, vocab)
     VOCAB_SIZE = len(vocab.article2index)
     print('Corpus length: {}\nVocabulary size: {}'.format(
         len(source), len(vocab.article2index)))
