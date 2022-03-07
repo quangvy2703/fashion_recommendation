@@ -361,7 +361,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
             optimizer.zero_grad()
 
             tgt_out = tgt[1:, :]
-            print("Loss, ", tgt_out.size(), logits.size())
+            print("Loss, ", tgt_out.reshape(-1).size(), logits.reshape(-1, logits.shape[-1]).size())
             loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
             loss.backward()
 
