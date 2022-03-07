@@ -101,7 +101,7 @@ def average_precision_at_k(y_true, y_pred, k=12):
         # print(i, y_true, y_pred)
         res = precision_at_k(y_true, y_pred, i) * rel_at_k(y_true_clone, y_pred, i)
         if res == 1:
-            y_true_clone.remove(y_true_clone[k-1])
+            y_true_clone = np.delete(y_true_clone, k-1)
         ap = ap + res
     return ap / min(k, len(y_true))
 
