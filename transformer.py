@@ -448,7 +448,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
     EMB_SIZE = cfg["HIDDEN_SIZE"]
     NHEAD = cfg["N_HEADS"]
     FFN_HID_DIM = 512
-    BATCH_SIZE = 128
+    BATCH_SIZE = cfg["BATCH_SIZE"]
     NUM_ENCODER_LAYERS = cfg["N_LAYERS"]
     NUM_DECODER_LAYERS = cfg["N_LAYERS"]
     N_EPOCHS = 100
