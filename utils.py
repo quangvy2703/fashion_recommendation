@@ -70,6 +70,7 @@ def rel_at_k(y_true, y_pred, k=12):
     score: double
            Relevance at k
     """
+
     if y_pred[k-1] in y_true:
         return 1
     else:
@@ -95,10 +96,13 @@ def average_precision_at_k(y_true, y_pred, k=12):
     ap = 0.0
     y_true = np.array(y_true)
     y_true = y_true[y_true > 4]
+    y_true_clone = y_true.copy()
     for i in range(1, k+1):
         # print(i, y_true, y_pred)
-        ap += precision_at_k(y_true, y_pred, i) * rel_at_k(y_true, y_pred, i)
-        
+        res = precision_at_k(y_true, y_pred, i) * rel_at_k(y_true_clone, y_pred, i)
+        if res == 1:
+            y_true_clone.remove(y_true_clone[k-1])
+        ap = ap + res
     return ap / min(k, len(y_true))
 
 def mean_average_precision(y_true, y_pred, k=12):

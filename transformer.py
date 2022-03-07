@@ -238,31 +238,38 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
 
 
 # function to generate output sequence using greedy algorithm
-def greedy_decode(model, src, src_features, src_mask, article_features, max_len, start_symbol):
+def greedy_decode(model, src, src_mask, max_len, start_symbol):
     src = src.to(DEVICE)
     src_mask = src_mask.to(DEVICE)
 
-    memory = model.encode(src, src_features, src_mask)
-    ys = torch.ones(1, src.size(1)).fill_(start_symbol).type(torch.long).to(DEVICE)
-    ys_features = torch.zeros(1, src.size(1), src_features.size(2)).type(torch.float).to(DEVICE)
-    print("In greedy ",  ys_features.size())
-    
+    memory = model.encode(src, src_mask)
+    ys = torch.ones(1, 1).fill_(start_symbol).type(torch.long).to(DEVICE)
     for i in range(max_len-1):
         memory = memory.to(DEVICE)
-        tgt_mask = (generate_square_subsequent_mask(ys.size(0)).type(torch.bool)).to(DEVICE)
-        out = model.decode(src, src_features, memory, tgt_mask)
+        tgt_mask = (generate_square_subsequent_mask(ys.size(0))
+                    .type(torch.bool)).to(DEVICE)
+        out = model.decode(ys, memory, tgt_mask)
         out = out.transpose(0, 1)
         prob = model.generator(out[:, -1])
         _, next_word = torch.max(prob, dim=1)
         next_word = next_word.item()
 
-        ys = torch.cat([ys, torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
-        ys_features = torch.cat([ys_features,
-                        torch.ones(src.size(1), src_features.size(2)).type_as(ys_features.data).fill_(article_features[next_word])], dim=0)       
+        ys = torch.cat([ys,
+                        torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
         if next_word == EOS_IDX:
             break
     return ys
 
+# actual function to translate input sentence into target language
+def translate(model: torch.nn.Module, src_sentence: str):
+    model.eval()
+    src = text_transform[SRC_LANGUAGE](src_sentence).view(-1, 1)
+    num_tokens = src.shape[0]
+    src_mask = (torch.zeros(num_tokens, num_tokens)).type(torch.bool)
+    tgt_tokens = greedy_decode(
+        model,  src, src_mask, max_len=num_tokens + 5, start_symbol=BOS_IDX).flatten()
+    return " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy()))).replace("<bos>", "").replace("<eos>", "")
+    
     
 def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article_features, epoch, saved_data_dir="saved_data_dir"):
     model.train()
@@ -415,15 +422,15 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_idx)
 
-    # optimizer = torch.optim.Adam(transformer.parameters(), lr=cfg["LR"], betas=(0.9, 0.98), eps=1e-9)
-    optimizer = torch.optim.SGD(transformer.parameters(), lr=cfg["LR"], momentum=0.9)
+    optimizer = torch.optim.Adam(transformer.parameters(), lr=cfg["LR"], betas=(0.9, 0.98), eps=1e-9)
+    # optimizer = torch.optim.SGD(transformer.parameters(), lr=cfg["LR"], momentum=0.9)
     for epoch in range(N_EPOCHS):
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
         
         val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, epoch)
 
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map}"))
-        torch.save(best_model, os.path.join(saved_data_dir, f'model_epoch{epoch}.pth'))
+        torch.save(transformer, os.path.join(saved_data_dir, f'model_epoch{epoch}.pth'))
             # Early Stop
         # if map12 > best_score:
         #     early_stop_counter = 0
