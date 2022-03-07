@@ -286,8 +286,8 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
                         total=total_batches)
     try:
         for step, batch in t:
-            if step < 5258:
-                continue
+            # if step < 5258:
+            #     continue
             src = X_train[:, batch]
             # torch.save(src, 'src.bin')
             src_features = [article_features[i] for i in src]
@@ -338,8 +338,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
     predicted = []
     targets = []
     for step, batch in t:
-        if step < 1300:
-            continue
+        # if step < 1300:
+        #     continue
         src = X_valid[:, batch]
         # torch.save(src, 'src.bin')
         src_features = [article_features[i] for i in src]
