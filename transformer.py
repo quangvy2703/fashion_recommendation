@@ -366,7 +366,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
             loss.backward()
 
             optimizer.step()
-            print("Loss ", losses.shape())
+            print("Loss ", loss.shape())
             losses += loss.item()
             batch_loss = loss.item() / float(batch_size)
             t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
