@@ -361,14 +361,14 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
             optimizer.zero_grad()
 
             tgt_out = tgt[1:, :]
-            # print("Loss, ", tgt_out.size(), logits.size())
+            print("Loss, ", tgt_out.size(), logits.size())
             loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
             loss.backward()
 
             optimizer.step()
             
             losses += loss.item()
-            # print("Loss ", np.array(loss.item()).shape())
+            
             batch_loss = loss.item() / float(batch_size)
             t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
     except:
