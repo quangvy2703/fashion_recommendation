@@ -99,9 +99,11 @@ def average_precision_at_k(y_true, y_pred, k=12):
     y_true_clone = y_true.copy()
     for i in range(1, k+1):
         # print(i, y_true, y_pred)
-        res, rem = precision_at_k(y_true, y_pred, i) * rel_at_k(y_true_clone, y_pred, i)
+        res, rem = rel_at_k(y_true_clone, y_pred, i)
         if res == 1:
             y_true_clone = y_true_clone[y_true_clone != rem]
+        res = precision_at_k(y_true, y_pred, i) * res
+
         ap = ap + res
     return ap / min(k, len(y_true))
 

@@ -150,11 +150,9 @@ def preprocess_corpus(trans, min_article_count):
     return cus_ids, source_trans, target_trans
 
 def preprocess_test(trans, vocab):
-    n_articles = {}
 
     cus_ids = []
-    source_trans = []
-    target_trans = []
+    trans = []
     customer_ids = trans.keys()
 
     for customer_id in tqdm(customer_ids, desc="Removing rare articles..."):
@@ -167,16 +165,12 @@ def preprocess_test(trans, vocab):
             tran.append(session)
             # trans[customer_id][idx] = session
         cus_ids.extend([customer_id] * (len(tran) - 1))
-        source_trans.extend(tran[:-1])
-        target_trans.extend(tran[1:])
-    total = len(n_articles.keys())
-    filtered = len(set(np.hstack(np.append(source_trans, target_trans))))
-    assert len(source_trans) == len(target_trans), "Source and Target must match in size!!!"
-    assert len(source_trans) == len(cus_ids), "The number of customer ids is not match!!!"
-    print(f"Keep {filtered} articles from {total} articles")
-    print(f"Preprocessing corpus done with {len(source_trans)} corpus")
+        trans.extend(tran)
+    
+    assert len(trans) == len(cus_ids), "The number of customer ids is not match!!!"
+    print(f"Preprocessing test dataset done")
 
-    return cus_ids, source_trans, target_trans
+    return cus_ids, trans
 
 
 def read_vocab(source, target):
@@ -272,55 +266,29 @@ def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"
     transactions = pickle.load(open(data_dir + '/customer_sequences_submission.pkl', 'rb'))
     vocab = Vocab()
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
-    customer_ids, source, target = preprocess_test(transactions, vocab)
-    VOCAB_SIZE = len(vocab.article2index)
-    print('Corpus length: {}\nVocabulary size: {}'.format(
-        len(source), len(vocab.article2index)))
+    customer_ids, source = preprocess_test(transactions, vocab)
 
-    X_train, X_valid, Y_train, Y_valid = train_test_split(source, target, test_size=0.2, random_state=42)
-
-    # customer_id_train = X_train[:, 1]
-    # X_train = X_train[:, 0]
-    # customer_id_valid = X_valid[:, 1]
-    # X_valid = X_valid[:, 0]
-
-    training_pairs = []
-    for source_session, target_session in zip(X_train, Y_train):
-        training_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))
+    X_test = []
+    for session in source:
+        session_tensor, _ = tensor_from_pair(vocab, session, session, max_seq_length)
+        X_test.append(session_tensor)
     
-    X_train, Y_train = zip(*training_pairs)
-    X_train = torch.cat(X_train, dim=-1)
-    Y_train = torch.cat(Y_train, dim=-1)
-    torch.save(X_train, os.path.join(save_data_dir, 'X_train.bin'))
-    torch.save(Y_train, os.path.join(save_data_dir, 'Y_train.bin'))
-    # torch.save(customer_id_train, os.path.join(save_data_dir, 'customer_ids_train.bin'))
-
-    valid_pairs = []
-    for source_session, target_session in zip(X_valid, Y_valid):
-        valid_pairs.append(tensor_from_pair(vocab, source_session, target_session, max_seq_length))      
-
-    X_valid, Y_valid = zip(*valid_pairs)
-    X_valid = torch.cat(X_valid, dim=-1)
-    Y_valid = torch.cat(Y_valid, dim=-1)
-    torch.save(X_valid, os.path.join(save_data_dir, 'X_valid.bin'))
-    torch.save(Y_valid, os.path.join(save_data_dir, 'Y_valid.bin'))
-    # torch.save(customer_id_valid, os.path.join(save_data_dir, 'customer_ids_valid.bin'))
+    X_test = torch.cat(X_test, dim=-1)
+    torch.save(X_test, os.path.join(saved_data_dir, 'X_test.bin'))
 
 
-    return X_train, Y_train, X_valid, Y_valid
-
+    return X_test
 
 # function to generate output sequence using greedy algorithm
-def greedy_decode(model, src, src_mask, max_len, start_symbol):
+def greedy_decode(model, src, src_features, max_len, start_symbol):
     src = src.to(DEVICE)
-
-    memory = model.encode(src, None)
-    ys = torch.ones(1, 1).fill_(start_symbol).type(torch.long).to(DEVICE)
+    src_features = src_features.to(DEVICE)
+    memory = model.encode(src, src_features, None)
+    ys = torch.ones(1, src.shape[1]).fill_(start_symbol).type(torch.long).to(DEVICE)
+    ys_features = torch.zeros(1, src.shape[1]).type(torch.long).to(DEVICE)
     for i in range(max_len-1):
         memory = memory.to(DEVICE)
-        tgt_mask = (generate_square_subsequent_mask(ys.size(0))
-                    .type(torch.bool)).to(DEVICE)
-        out = model.decode(ys, memory, tgt_mask)
+        out = model.decode(ys, ys_features, memory, None)
         out = out.transpose(0, 1)
         prob = model.generator(out[:, -1])
         _, next_word = torch.max(prob, dim=1)
@@ -333,9 +301,19 @@ def greedy_decode(model, src, src_mask, max_len, start_symbol):
     return ys
 
 # actual function to translate input sentence into target language
-def translate(model: torch.nn.Module, src_sentence: str):
+def translate(model: torch.nn.Module, X_test: Tensor, article_features, batch_size):
     model.eval()
-    src = text_transform[SRC_LANGUAGE](src_sentence).view(-1, 1)
+    total_batches = int(X_test.shape[1]/batch_size) + 1
+    indices = list(range(X_test.shape[1]))
+    step = 1
+    batch_loss = 0
+
+    for step, batch in tqdm(enumerate(batch_generator(indices, batch_size))):
+            src = X_test[:, batch]
+            # torch.save(src, 'src.bin')
+            src_features = [article_features[i] for i in src]
+
+
     num_tokens = src.shape[0]
     src_mask = (torch.zeros(num_tokens, num_tokens)).type(torch.bool)
     tgt_tokens = greedy_decode(
