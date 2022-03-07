@@ -368,7 +368,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
             optimizer.step()
             
             losses += loss.item()
-            print("Loss ", np.array(loss.item()).shape())
+            # print("Loss ", np.array(loss.item()).shape())
             batch_loss = loss.item() / float(batch_size)
             t.set_description(f'Training epoch {epoch+1} - step {step} - loss {batch_loss}')
     except:
