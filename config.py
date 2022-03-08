@@ -3,6 +3,7 @@ cfg["ARTICLES_PATH"] = "datasets/articles.csv"
 cfg["TRANSACTIONS_PATH"] = "datasets/transactions_train.csv"
 cfg["CUSTOMERS_PATH"] = "datasets/customers.csv"
 cfg['DATA_DIR'] = "datasets"
+cfg["MODEL_PATH"] = "datasets/customers.csv"
 
 cfg["MIN_SEQUENCE_LENGTH"] = 2
 cfg["MAX_SEQUENCE_LENGTH"] = 12
