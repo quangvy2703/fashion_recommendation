@@ -12,6 +12,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import os
 from datetime import datetime
+import pandas as pd
 from utils import *
 import math
 from config import *
@@ -275,7 +276,7 @@ def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"
     
     X_test = torch.cat(X_test, dim=-1)
     torch.save(X_test, os.path.join(saved_data_dir, 'X_test.bin'))
-
+    torch.save(customer_ids, os.path.join(saved_data_dir, 'customer_ids_test.bin'))
 
     return X_test
 
@@ -285,40 +286,46 @@ def greedy_decode(model, src, src_features, max_len, start_symbol):
     src_features = src_features.to(DEVICE)
     memory = model.encode(src, src_features, None)
     ys = torch.ones(1, src.shape[1]).fill_(start_symbol).type(torch.long).to(DEVICE)
-    ys_features = torch.zeros(1, src.shape[1]).type(torch.long).to(DEVICE)
+    ys_features = torch.zeros(1, src.shape[1], src_features.shape[2]).type(torch.long).to(DEVICE)
     for i in range(max_len-1):
         memory = memory.to(DEVICE)
         out = model.decode(ys, ys_features, memory, None)
+        # out seq_len x batch_size x output_dim
         out = out.transpose(0, 1)
         prob = model.generator(out[:, -1])
         _, next_word = torch.max(prob, dim=1)
         next_word = next_word.item()
 
         ys = torch.cat([ys,
-                        torch.ones(1, 1).type_as(src.data).fill_(next_word)], dim=0)
+                        torch.ones(1, src.shape[1]).type_as(src.data).fill_(next_word)], dim=0)
         if next_word == EOS_IDX:
             break
     return ys
 
 # actual function to translate input sentence into target language
-def translate(model: torch.nn.Module, X_test: Tensor, article_features, batch_size):
+def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_features, batch_size, vocab):
     model.eval()
     total_batches = int(X_test.shape[1]/batch_size) + 1
     indices = list(range(X_test.shape[1]))
     step = 1
     batch_loss = 0
 
+    predicted = {}
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size))):
             src = X_test[:, batch]
             # torch.save(src, 'src.bin')
-            src_features = [article_features[i] for i in src]
-
-
-    num_tokens = src.shape[0]
-    src_mask = (torch.zeros(num_tokens, num_tokens)).type(torch.bool)
-    tgt_tokens = greedy_decode(
-        model,  src, src_mask, max_len=num_tokens + 5, start_symbol=BOS_IDX).flatten()
-    return " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(tgt_tokens.cpu().numpy()))).replace("<bos>", "").replace("<eos>", "")
+            src_features = [article_features[i] for i in src]        
+            tgt_ids = greedy_decode(
+                model,  src, src_features, MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX)
+            #tgt_tokens max_len x batch_size
+            for i in range(len(tgt_ids.shape[1])):
+                tgt_tokens = vocab.index2article(tgt_ids.cpu().numpy()[:, i])
+                predicted[customer_ids[batch_size*step + i]] = tgt_tokens
+    assert len(predicted.keys()) == 1371980, f"Len submission file is {len(predicted.keys())} mismatch 1371980"
+    predicted_df = pd.DataFrame({'customer_id': predicted.keys(), 
+                    '               prediction': predicted.values()})  
+    predicted_df.to_csv(index=False) 
+    
     
     
 def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article_features, epoch, saved_data_dir="saved_data_dir"):
@@ -332,7 +339,7 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
     step = 1
     batch_loss = 10
     t = tqdm(enumerate(batch_generator(indices, batch_size)),
-                            desc=f'Training epoch {epoch+1} - step {step} - loss {batch_loss}',
+                        desc=f'Training epoch {epoch+1} - step {step} - loss {batch_loss}',
                         total=total_batches)
     try:
         for step, batch in t:
