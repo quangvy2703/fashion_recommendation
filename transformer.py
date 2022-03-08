@@ -157,7 +157,7 @@ def preprocess_test(transactions, vocab):
     customer_ids = transactions.keys()
 
     for customer_id in tqdm(customer_ids, desc="Removing rare articles..."):
-        sessions = trans[customer_id]
+        sessions = transactions[customer_id]
         tran = []
         for session in sessions:
             session = [art if art in vocab.article2index.keys() else UNK_token for art in session]
