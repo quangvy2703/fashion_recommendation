@@ -314,7 +314,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size))):
             src = X_test[:, batch]
             # torch.save(src, 'src.bin')
-            src_features = [article_features[i] for i in src]        
+            src_features = torch.tensor([article_features[i] for i in src], dtype=torch.float64)    
             tgt_ids = greedy_decode(
                 model,  src, src_features, MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX)
             #tgt_tokens max_len x batch_size
