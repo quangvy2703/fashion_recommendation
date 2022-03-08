@@ -296,7 +296,7 @@ def greedy_decode(model, src, src_features, max_len, start_symbol):
         _, next_word = torch.max(prob, dim=1)
         next_word = next_word.cpu().numpy()
         print(next_word)
-        ys = torch.cat([ys, next_word], dim=0)
+        ys = torch.cat([ys, torch.tensor(next_word, dtype=torch.long).to(DEVICE)], dim=0)
         if next_word == EOS_IDX:
             break
     return ys
