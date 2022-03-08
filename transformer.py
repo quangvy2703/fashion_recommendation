@@ -294,8 +294,8 @@ def greedy_decode(model, src, src_features, max_len, start_symbol):
         out = out.transpose(0, 1)
         prob = model.generator(out[:, -1])
         _, next_word = torch.max(prob, dim=1)
-        print(next_word.cpu().numpy())
-        print(ys.size(), torch.unsqueeze(next_word, 0).size())
+        # print(next_word.cpu().numpy())
+        # print(ys.size(), torch.unsqueeze(next_word, 0).size())
         ys = torch.cat([ys, torch.unsqueeze(next_word, 0)], dim=0)
     return ys
 
