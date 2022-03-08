@@ -490,6 +490,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
         print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, Val loss: {val_loss:.3f}, MAP@12: {map}"))
         torch.save(transformer, os.path.join(saved_data_dir, f'model_epoch{epoch}.pth'))
+        os.system(f"zip -r epoch_{epoch}.zip ./{saved_data_dir}/model_epoch{epoch}.pth")
             # Early Stop
         # if map12 > best_score:
         #     early_stop_counter = 0
@@ -503,6 +504,22 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         #         print('Early stop!')
         #         torch.save(best_model, os.path.join(saved_data_dir, 'best_epoch.pth'))
         #         break    
+
+def test_transformer(saved_data_dir, epoch):
+    model_path = os.path.join(saved_data_dir, f'model_epoch{epoch}.pth')
+    data_path = os.path.join(saved_data_dir, 'X_test.bin')
+    customer_path = os.path.join(saved_data_dir, 'customer_ids_test.bin')
+    model = torch.load(model_path)
+    X_test = torch.load(data_path)
+    customer_ids = os.path.join(customer_path)
+    vocab = Vocab()
+    vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
+    print("Vocab size ", VOCAB_SIZE, len(vocab.article2index.keys()))
+    vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
+    article_features = np.array(vocab.article_features, dtype=np.double)
+
+    translate(model, X_test, customer_ids, article_features, cfg['BATCH_SIZE'], vocab)
+    
 
 class CustomerEmbedding(nn.Module):
     def __init__(self, input_size, emb_size):

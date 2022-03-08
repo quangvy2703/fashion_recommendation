@@ -15,6 +15,8 @@ import random
 from sklearn.model_selection import train_test_split
 from run_transformer import train_transformer
 import warnings
+
+from transformer import test_transformer
 warnings.filterwarnings("ignore")
 
 def parse_args():
@@ -24,9 +26,11 @@ def parse_args():
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--hidden', type=int, default=1024)
     parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--epoch_test', type=int, default=10)
     parser.add_argument('--lr', type=float, default=0.1)
     parser.add_argument('--n_layers', type=int, default=1)
     parser.add_argument('--continue_training', type=bool, default=False)
+    parser.add_argument('--testing', type=bool, default=False)
     parser.add_argument('--seed', type=int, default=1204, help='random seed')
     args = parser.parse_args()
     return args
@@ -40,12 +44,18 @@ if __name__ == '__main__':
     cfg['BATCH_SIZE'] = args.batch_size
     cfg['N_LAYERS'] = args.n_layers
     cfg['LR'] = args.lr
+    cfg['EPOCH_TEST'] = args.epoch_test
 
     
 
     # trainer = Training(cfg)
     # trainer.start_training()
-    train_transformer(data_dir=args.data_dir, saved_data_dir=args.saved_data_dir)
+    if args.testing:
+        print("Starting testing phase...")
+        test_transformer(args.saved_data_dir, args.epoch_test)
+    else:
+        print("Starting training phase...")
+        train_transformer(data_dir=args.data_dir, saved_data_dir=args.saved_data_dir)
 
 # from transformer import *
 
