@@ -314,7 +314,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size))):
             src = X_test[:, batch]
             # torch.save(src, 'src.bin')
-            src_features = torch.tensor([article_features[i] for i in src], dtype=torch.float64)    
+            src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
             tgt_ids = greedy_decode(
                 model,  src, src_features, MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX)
             #tgt_tokens max_len x batch_size
@@ -506,10 +506,12 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         #         break    
 
 def test_transformer(saved_data_dir, epoch):
-    prepare_testdata(data_dir=cfg['DATA_DIR'], saved_data_dir=saved_data_dir)
+    data_path = os.path.join(saved_data_dir, 'X_test.bin')
+    if os.path.exists(data_path) is False:
+        prepare_testdata(data_dir=cfg['DATA_DIR'], saved_data_dir=saved_data_dir)
     # model_path = os.path.join(saved_data_dir, f'model_epoch{epoch}.pth')
     model_path = os.path.join(cfg['MODEL_PATH'])
-    data_path = os.path.join(saved_data_dir, 'X_test.bin')
+    
     customer_path = os.path.join(saved_data_dir, 'customer_ids_test.bin')
     model = torch.load(model_path)
     X_test = torch.load(data_path)
