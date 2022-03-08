@@ -293,7 +293,7 @@ def greedy_decode(model, src, src_features, max_len, start_symbol):
         # out seq_len x batch_size x output_dim
         out = out.transpose(0, 1)
         prob = model.generator(out[:, -1])
-        _, next_word = torch.max(prob, dim=2)
+        _, next_word = torch.max(prob, dim=0)
         next_word = next_word.cpu().numpy()
         print(next_word)
         ys = torch.cat([ys, next_word], dim=0)
