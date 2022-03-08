@@ -286,7 +286,7 @@ def greedy_decode(model, src, src_features, max_len, start_symbol):
     src_features = src_features.to(DEVICE)
     memory = model.encode(src, src_features, None)
     ys = torch.ones(1, src.shape[1]).fill_(start_symbol).type(torch.long).to(DEVICE)
-    ys_features = torch.zeros(1, src.shape[1], src_features.shape[2]).type(torch.long).to(DEVICE)
+    ys_features = torch.zeros(1, src.shape[1], src_features.shape[2]).type(torch.double).to(DEVICE)
     for i in range(max_len-1):
         memory = memory.to(DEVICE)
         out = model.decode(ys, ys_features, memory, None)
