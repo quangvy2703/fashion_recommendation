@@ -264,9 +264,10 @@ def prepare_data(data_dir="datasets_transformer", save_data_dir="saved_dir"):
 
 def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"):
     max_seq_length = MAX_SEQUENCE_LENGTH + 2
-    transactions = pickle.load(open(data_dir + '/customer_sequences_submission.pkl', 'rb'))
     vocab = Vocab()
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
+    transactions = pickle.load(open(data_dir + '/customer_sequences_submission.pkl', 'rb'))
+    print(transactions)
     customer_ids, source = preprocess_test(transactions, vocab)
 
     X_test = []
