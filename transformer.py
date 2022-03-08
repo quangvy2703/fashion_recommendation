@@ -165,10 +165,10 @@ def preprocess_test(transactions, vocab):
             session = session[-max_length: ]           
         tran.append(session)
             # trans[customer_id][idx] = session
-        cus_ids.extend([customer_id] * (len(tran) - 1))
+        cus_ids.append(customer_id)
         trans.extend(tran)
     
-    assert len(trans) == len(cus_ids), "The number of customer ids is not match!!!"
+    assert len(trans) == len(cus_ids), f"The number of customer ids is not match!!! {len(trans)} vs {len(cus_ids)}"
     print(f"Preprocessing test dataset done")
 
     return cus_ids, trans
