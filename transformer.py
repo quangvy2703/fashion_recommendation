@@ -297,8 +297,6 @@ def greedy_decode(model, src, src_features, max_len, start_symbol):
         print(next_word.cpu().numpy())
         print(ys.size(), torch.unsqueeze(next_word, 0).size())
         ys = torch.cat([ys, torch.unsqueeze(next_word, 0)], dim=0)
-        if next_word == EOS_IDX:
-            break
     return ys
 
 # actual function to translate input sentence into target language
