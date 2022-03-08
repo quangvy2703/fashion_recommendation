@@ -506,6 +506,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         #         break    
 
 def test_transformer(saved_data_dir, epoch):
+    prepare_testdata(data_dir=cfg['DATA_DIR'], saved_data_dir=saved_data_dir)
     model_path = os.path.join(saved_data_dir, f'model_epoch{epoch}.pth')
     data_path = os.path.join(saved_data_dir, 'X_test.bin')
     customer_path = os.path.join(saved_data_dir, 'customer_ids_test.bin')
