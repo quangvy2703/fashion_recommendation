@@ -150,11 +150,11 @@ def preprocess_corpus(trans, min_article_count):
 
     return cus_ids, source_trans, target_trans
 
-def preprocess_test(trans, vocab):
+def preprocess_test(transactions, vocab):
 
     cus_ids = []
     trans = []
-    customer_ids = trans.keys()
+    customer_ids = transactions.keys()
 
     for customer_id in tqdm(customer_ids, desc="Removing rare articles..."):
         sessions = trans[customer_id]
@@ -267,7 +267,6 @@ def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"
     vocab = Vocab()
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
     transactions = pickle.load(open(data_dir + '/customer_sequences_submission.pkl', 'rb'))
-    print(transactions)
     customer_ids, source = preprocess_test(transactions, vocab)
 
     X_test = []
