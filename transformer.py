@@ -1,4 +1,5 @@
 from ntpath import join
+from operator import index
 import pickle
 from pickletools import optimize
 import random
@@ -309,10 +310,11 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     batch_loss = 0
     # torch.save("customer_ids.bin", cust)
     predicted = {}
+
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)), total=total_batches):
             src = X_test[:, batch]
-            if step == 10:
-                break
+            # if step == 10:
+            #     break
             # torch.save(src, 'src.bin')
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
             tgt_ids = greedy_decode(
@@ -444,6 +446,11 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # tgt_tokens = greedy_decode(model, src, src_features, src_mask, article_features, max_len=MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX).flatten()
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
+    saved = {}
+    saved['target'] = np.transpose(targets)
+    saved['predict'] = np.transpose(predicted)
+    saved_df = pd.DataFrame(saved)
+    saved_df.to_csv(f"eval_{epoch}.csv", index=False)
     map = mean_average_precision(np.transpose(targets), np.transpose(predicted), k=11)
     
     
@@ -476,7 +483,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     transformer = Seq2SeqTransformer(NUM_ENCODER_LAYERS, NUM_DECODER_LAYERS, EMB_SIZE,
                                     NHEAD, VOCAB_SIZE, vocab.article_features_size, FFN_HID_DIM)
-
+    transformer = torch.load(cfg['MODELS_PATH'])
     for p in transformer.parameters():
         if p.dim() > 1:
             nn.init.xavier_uniform_(p)
