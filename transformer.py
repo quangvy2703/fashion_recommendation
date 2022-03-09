@@ -447,7 +447,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
     saved = {}
-    print(predicted.shape(), targets.shape())
+    print(np.shape(predicted), np.shape(targets))
     saved['target'] = str(targets)
     saved['predict'] = str(predicted)
     
