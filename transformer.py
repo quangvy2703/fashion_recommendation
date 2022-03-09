@@ -306,7 +306,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     indices = list(range(X_test.shape[1]))
     step = 1
     batch_loss = 0
-
+    # torch.save("customer_ids.bin", cust)
     predicted = {}
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size))):
             src = X_test[:, batch]
@@ -513,7 +513,7 @@ def test_transformer(saved_data_dir, epoch):
     customer_path = os.path.join(saved_data_dir, 'customer_ids_test.bin')
     model = torch.load(model_path)
     X_test = torch.load(data_path)
-    customer_ids = os.path.join(customer_path)
+    customer_ids = torch.load(customer_path)
     vocab = Vocab()
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
     print("Vocab size ", VOCAB_SIZE, len(vocab.article2index.keys()))
