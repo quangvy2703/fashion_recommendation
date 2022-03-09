@@ -330,7 +330,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     assert len(predicted.keys()) == 1371980, f"Len submission file is {len(predicted.keys())} mismatch 1371980"
     predicted_df = pd.DataFrame({'customer_id': predicted.keys(), 
                                 'prediction': predicted.values()})  
-    predicted_df.to_csv(index=False) 
+    predicted_df.to_csv('submission.csv', index=False) 
     
     
     
