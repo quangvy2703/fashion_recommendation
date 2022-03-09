@@ -318,7 +318,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
             for i in range(tgt_ids.shape[1]):
                 tgt_id = tgt_ids.cpu().numpy()[:, i]
                 tgt_tokens = [vocab.index2article[_id] for _id in tgt_id]
-                print(tgt_tokens)
+                # print(tgt_tokens)
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens
     all_customer_ids = pd.read_csv(os.path.join(cfg['DATA_DIR'], 'customers.csv')).customer_id.values
     remain_customer_ids = list(set(all_customer_ids) - set(predicted.keys()))
