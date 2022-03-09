@@ -317,7 +317,6 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
             #tgt_tokens max_len x batch_size
             for i in range(tgt_ids.shape[1]):
                 tgt_id = tgt_ids.cpu().numpy()[:, i]
-                print(vocab.index2article)
                 tgt_tokens = [vocab.index2article[_id] for _id in tgt_id]
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens
     assert len(predicted.keys()) == 1371980, f"Len submission file is {len(predicted.keys())} mismatch 1371980"
