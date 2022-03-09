@@ -167,50 +167,45 @@ if __name__ == '__main__':
     
 #     print(f"Created dataset with {len(samples['customer_id'])} corpus")
     
-# def gen_test_data(transactions_df):
-#     transactions_df['article_id'] = transactions_df['article_id'].astype(str)
-#     transactions_df['t_dat'] = pd.to_datetime(transactions_df['t_dat'], format="%Y-%m-%d")
-#     trans_by_cus = transactions_df.groupby(['customer_id'])
-#     customer_ids = transactions_df.customer_id.unique()
-#     last_date = transactions_df['t_dat'].copy().sort_values().values[-1]
-#     last_train_date = last_date - np.timedelta64(cfg['PERIODS'], 'D')
-#     trans_by_cus = transactions_df[transactions_df['t_dat'] >= last_train_date]
-#     customer_filter_ids = trans_by_cus.customer_id.unique()
-#     other_customer_ids = list(set(customer_ids) - set(customer_filter_ids))
-#     trans_by_cus = trans_by_cus.groupby(['customer_id'])
-#     customer_sequences = {}
-#     for customer_id in tqdm(customer_filter_ids, total=len(customer_filter_ids), desc=f"{len(customer_sequences.keys())}"):
-#         transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
-#         transactions = transaction_of_customer.article_id.values
-#         customer_sequences[customer_id] = []
+def gen_test_data(transactions_df):
+    transactions_df['article_id'] = transactions_df['article_id'].astype(str)
+    transactions_df['t_dat'] = pd.to_datetime(transactions_df['t_dat'], format="%Y-%m-%d")
+    trans_by_cus = transactions_df.groupby(['customer_id'])
+    customer_ids = transactions_df.customer_id.unique()
+    trans_by_cus = trans_by_cus.groupby(['customer_id'])
+    customer_sequences = {}
+    for customer_id in tqdm(customer_ids, total=len(customer_ids), desc=f"{len(customer_sequences.keys())}"):
+        transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
+        transactions = transaction_of_customer.article_id.values
+        customer_sequences[customer_id] = []
         
-#         session = []
-#         # print(transactions)
-#         for transaction in transactions:
-#             session = session + list(map(int, transaction.split(',')))
-#         customer_sequences[customer_id] = session
+        session = []
+        # print(transactions)
+        for transaction in transactions:
+            session = session + list(map(int, transaction.split(',')))
+        customer_sequences[customer_id] = session
 
 
-#     trans_by_cus = transactions_df.groupby(['customer_id'])
+    trans_by_cus = transactions_df.groupby(['customer_id'])
 
-#     for customer_id in tqdm(other_customer_ids, total=len(other_customer_ids)):
-#         transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
-#         transaction = transaction_of_customer['article_id'].values
+    for customer_id in tqdm(other_customer_ids, total=len(other_customer_ids)):
+        transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
+        transaction = transaction_of_customer['article_id'].values
 
-#         last_date = transaction_of_customer['t_dat'].copy().sort_values().values[-1]
-#         last_train_date = last_date - np.timedelta64(cfg['PERIODS'], 'D')
+        last_date = transaction_of_customer['t_dat'].copy().sort_values().values[-1]
+        last_train_date = last_date - np.timedelta64(cfg['PERIODS'], 'D')
 
-#         last_session = transaction_of_customer[transaction_of_customer['t_dat'] >= last_train_date].article_id.values
+        last_session = transaction_of_customer[transaction_of_customer['t_dat'] >= last_train_date].article_id.values
 
-#         customer_sequences[customer_id] = []
-#         a_session = []
-#         for session in last_session:
-#             a_session = a_session + list(map(int, session.split(',')))
+        customer_sequences[customer_id] = []
+        a_session = []
+        for session in last_session:
+            a_session = a_session + list(map(int, session.split(',')))
 
-#         customer_sequences[customer_id] = a_session
+        customer_sequences[customer_id] = a_session
 
-#     with open('datasets_transformer/customer_sequences_submission.pkl', "wb") as f:
-#         pickle.dump(customer_sequences, f)
+    with open('datasets_transformer/customer_sequences_submission.pkl', "wb") as f:
+        pickle.dump(customer_sequences, f)
 
 # def create_dataset_submission():
 #     with open("datasets_transformer/customer_sequences_submission.pkl", "rb") as f:

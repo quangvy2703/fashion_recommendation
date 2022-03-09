@@ -308,7 +308,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     batch_loss = 0
     # torch.save("customer_ids.bin", cust)
     predicted = {}
-    for step, batch in tqdm(enumerate(batch_generator(indices, batch_size))):
+    for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)), total=total_batches):
             src = X_test[:, batch]
             # torch.save(src, 'src.bin')
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
@@ -318,10 +318,15 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
             for i in range(tgt_ids.shape[1]):
                 tgt_id = tgt_ids.cpu().numpy()[:, i]
                 tgt_tokens = [vocab.index2article[_id] for _id in tgt_id]
+                print(tgt_tokens)
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens
+    all_customer_ids = pd.read_csv(os.path.join(cfg['DATA_DIR'], 'customers.csv')).customer_id.values
+    remain_customer_ids = list(set(all_customer_ids) - set(predicted.keys()))
+    for customer_id in remain_customer_ids:
+        predicted[customer_id] = tgt_tokens
     assert len(predicted.keys()) == 1371980, f"Len submission file is {len(predicted.keys())} mismatch 1371980"
     predicted_df = pd.DataFrame({'customer_id': predicted.keys(), 
-                    '               prediction': predicted.values()})  
+                                'prediction': predicted.values()})  
     predicted_df.to_csv(index=False) 
     
     
