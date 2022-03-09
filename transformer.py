@@ -447,9 +447,9 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
     saved = {}
-    print(np.shape(predicted), np.shape(targets))
-    saved['target'] = str(targets)
-    saved['predict'] = str(predicted)
+    print(np.shape(np.transpose(predicted)), np.shape(np.transpose(targets)))
+    saved['target'] = np.transpose(targets)
+    saved['predict'] = np.transpose(predicted)
     
     saved_df = pd.DataFrame(saved, index=[i for i in range(len(targets))])
     saved_df.to_csv(f"eval_{epoch}.csv")
