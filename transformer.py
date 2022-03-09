@@ -450,9 +450,11 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
     print(np.shape(np.transpose(predicted)), np.shape(np.transpose(targets)))
     saved['target'] = np.transpose(targets)
     saved['predict'] = np.transpose(predicted)
+    np.save('targets.npy', saved['target'])
+    np.save('predict.npy', saved['predict'])
     
-    saved_df = pd.DataFrame(saved, index=[i for i in range(len(targets))])
-    saved_df.to_csv(f"eval_{epoch}.csv")
+    # saved_df = pd.DataFrame(saved, index=[i for i in range(len(targets))])
+    # saved_df.to_csv(f"eval_{epoch}.csv")
     map = mean_average_precision(np.transpose(targets), np.transpose(predicted), k=11)
     
     
