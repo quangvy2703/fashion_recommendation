@@ -483,20 +483,28 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     transformer = Seq2SeqTransformer(NUM_ENCODER_LAYERS, NUM_DECODER_LAYERS, EMB_SIZE,
                                     NHEAD, VOCAB_SIZE, vocab.article_features_size, FFN_HID_DIM)
-    transformer = torch.load(cfg['MODELS_PATH'])
+
     for p in transformer.parameters():
         if p.dim() > 1:
             nn.init.xavier_uniform_(p)
+    last_epoch = 0
+    if cfg["MODELS_PATH"] is not None:        
+        transformer = torch.load(cfg['MODELS_PATH'])
+        last_epoch = cfg["MODELS_PATH"].split('/')[-1].split('_')[1].split('.')[0].replace('epoch', '')
+        last_epoch = int(last_epoch)
 
     transformer = transformer.double()
     transformer = transformer.to(DEVICE)
     
 
+
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_idx)
 
     # optimizer = torch.optim.Adam(transformer.parameters(), lr=cfg["LR"], betas=(0.9, 0.98), eps=1e-9)
     optimizer = torch.optim.SGD(transformer.parameters(), lr=cfg["LR"], momentum=0.9)
-    for epoch in range(N_EPOCHS):
+    val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, epoch)
+    
+    for epoch in range(last_epoch + 1, N_EPOCHS):       
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
         
         val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, epoch)
