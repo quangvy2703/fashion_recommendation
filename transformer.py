@@ -447,8 +447,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
     saved = {}
-    saved['target'] = np.transpose(targets)
-    saved['predict'] = np.transpose(predicted)
+    saved['target'] = [np.transpose(targets)]
+    saved['predict'] = [np.transpose(predicted)]
     saved_df = pd.DataFrame(saved)
     saved_df.to_csv(f"eval_{epoch}.csv", index=False)
     map = mean_average_precision(np.transpose(targets), np.transpose(predicted), k=11)
