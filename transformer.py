@@ -302,6 +302,7 @@ def greedy_decode(model, src, src_features, max_len, start_symbol):
 # actual function to translate input sentence into target language
 def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_features, batch_size, vocab):
     model.eval()
+    all_customer_ids = pd.read_csv(os.path.join(cfg['DATA_DIR'], 'customers.csv')).customer_id.values
     total_batches = int(X_test.shape[1]/batch_size) + 1
     indices = list(range(X_test.shape[1]))
     step = 1
@@ -310,6 +311,8 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     predicted = {}
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)), total=total_batches):
             src = X_test[:, batch]
+            if step == 10:
+                break
             # torch.save(src, 'src.bin')
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
             tgt_ids = greedy_decode(
@@ -320,7 +323,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
                 tgt_tokens = [vocab.index2article[_id] for _id in tgt_id]
                 # print(tgt_tokens)
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens
-    all_customer_ids = pd.read_csv(os.path.join(cfg['DATA_DIR'], 'customers.csv')).customer_id.values
+    
     remain_customer_ids = list(set(all_customer_ids) - set(predicted.keys()))
     for customer_id in remain_customer_ids:
         predicted[customer_id] = tgt_tokens
