@@ -492,7 +492,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         if p.dim() > 1:
             nn.init.xavier_uniform_(p)
     last_epoch = 0
-    if cfg["MODEL_PATH"] is not None:        
+    if cfg["MODEL_PATH"] is not "default":        
         transformer = torch.load(cfg['MODEL_PATH'])
         last_epoch = cfg["MODEL_PATH"].split('/')[-1].split('_')[1].split('.')[0].replace('epoch', '')
         last_epoch = int(last_epoch)
