@@ -369,10 +369,10 @@ def train_epoch(model, optimizer, loss_fn, batch_size, X_train, Y_train, article
             tgt_input = tgt[:-1, :]
             tgt_features = tgt_features[:-1, :]
 
-            # src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
+            src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
             # print("In main ", src_mask.size(), tgt_mask.size(), src_padding_mask.size(), tgt_padding_mask.size())
-            logits = model(src, tgt_input, src_features, tgt_features, None, None, None, None, None)
-            # logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
+            # logits = model(src, tgt_input, src_features, tgt_features, None, None, None, None, None)
+            logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
             optimizer.zero_grad()
 
             tgt_out = tgt[1:, :]
@@ -428,9 +428,9 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         tgt_input = tgt[:-1, :]
         tgt_features = tgt_features[:-1, :]
 
-        # src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
-        # logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
-        logits = model(src, tgt_input, src_features, tgt_features, None, None, None, None, None)
+        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(src, tgt_input)
+        logits = model(src, tgt_input, src_features, tgt_features, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask, src_padding_mask)
+        # logits = model(src, tgt_input, src_features, tgt_features, None, None, None, None, None)
         tgt_out = tgt[1:, :]       
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         losses += loss.item()
