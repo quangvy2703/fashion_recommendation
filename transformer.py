@@ -405,8 +405,8 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
     predicted = []
     targets = []
     for step, batch in t:
-        if step < 1300:
-            continue
+        # if step < 1300:
+        #     continue
         src = X_valid[:, batch]
         # torch.save(src, 'src.bin')
         src_features = [article_features[i] for i in src]
@@ -506,7 +506,7 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     # optimizer = torch.optim.Adam(transformer.parameters(), lr=cfg["LR"], betas=(0.9, 0.98), eps=1e-9)
     optimizer = torch.optim.SGD(transformer.parameters(), lr=cfg["LR"], momentum=0.9)
-    val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, last_epoch)
+    # val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, last_epoch)
 
     for epoch in range(last_epoch + 1, N_EPOCHS):       
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
