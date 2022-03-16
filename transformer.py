@@ -305,7 +305,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
         out = out.transpose(0, 1)
         print("out dim ", out.size())
         prob = model.generator(out[:, -1])
-        print("out dim ", out.size())
+        print("out dim ", prob.size())
         torch.save(prob, 'prod.bin')
         _, next_word = torch.max(prob, dim=1)
         # print(next_word.cpu().numpy())
