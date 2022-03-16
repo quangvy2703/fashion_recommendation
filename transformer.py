@@ -287,7 +287,7 @@ def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"
     return X_test
 
 # function to generate output sequence using greedy algorithm
-def greedy_decode(model, src, src_features, src_mask, max_len, start_symbol):
+def greedy_decode(model, src, src_features, src_mask, article_features, max_len, start_symbol):
     src = src.to(DEVICE)
     src_features = src_features.to(DEVICE)
     src_mask = src_mask.to(DEVICE)
@@ -306,6 +306,7 @@ def greedy_decode(model, src, src_features, src_mask, max_len, start_symbol):
         # print(next_word.cpu().numpy())
         # print(ys.size(), torch.unsqueeze(next_word, 0).size())
         ys = torch.cat([ys, torch.unsqueeze(next_word, 0)], dim=0)
+        ys_features = torch.cat([ys_features, article_features[torch.unsqueeze(next_word, 0)]], dim=0)
     return ys
 
 # actual function to translate input sentence into target language
@@ -325,7 +326,6 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
                 break
             # torch.save(src, 'src.bin')
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
-            print(torch.sum(src_features, 0))
             num_tokens = src.shape[0]
             src_mask = (torch.zeros(num_tokens, num_tokens)).type(torch.bool)
             # print("SRC ", src)
