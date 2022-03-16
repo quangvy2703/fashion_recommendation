@@ -160,7 +160,7 @@ def preprocess_test(transactions, vocab):
         session = transactions[customer_id]
         tran = []
         # print("Session ", session)
-        session = [art if str(art) in vocab.article2index.keys() else UNK_token for art in session]
+        session = [str(art) if str(art) in vocab.article2index.keys() else UNK_token for art in session]
         # print("Token ", session)
         if len(session) > max_length:
             session = session[-max_length: ]           
