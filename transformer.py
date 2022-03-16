@@ -315,8 +315,8 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
 
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)), total=total_batches):
             src = X_test[:, batch]
-            # if step == 10:
-            #     break
+            if step == 100:
+                break
             # torch.save(src, 'src.bin')
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
             num_tokens = src.shape[0]
