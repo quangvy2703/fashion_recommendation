@@ -160,14 +160,17 @@ def preprocess_test(transactions, vocab):
     for customer_id in tqdm(customer_ids, desc="Removing rare articles..."):
         session = transactions[customer_id]
         tran = []
-
+        print("Session ", session)
         session = [art if art in vocab.article2index.keys() else UNK_token for art in session]
+        print("Token ", session)
         if len(session) > max_length:
             session = session[-max_length: ]           
         tran.append(session)
             # trans[customer_id][idx] = session
         cus_ids.append(customer_id)
         trans.extend(tran)
+        if len(cus_ids) > 10:
+            break
     
     assert len(trans) == len(cus_ids), f"The number of customer ids is not match!!! {len(trans)} vs {len(cus_ids)}"
     print(f"Preprocessing test dataset done")
