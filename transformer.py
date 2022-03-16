@@ -305,6 +305,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
         _, next_word = torch.max(prob, dim=1)
         # print(next_word.cpu().numpy())
         # print(ys.size(), torch.unsqueeze(next_word, 0).size())
+        print(torch.unsqueeze(next_word, 0))
         ys = torch.cat([ys, torch.unsqueeze(next_word, 0)], dim=0)
         ys_features = torch.cat([ys_features, article_features[torch.unsqueeze(next_word, 0)]], dim=0)
     return ys
