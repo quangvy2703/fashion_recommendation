@@ -308,6 +308,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
         print(torch.unsqueeze(next_word, 0))
         ys = torch.cat([ys, torch.unsqueeze(next_word, 0)], dim=0)
         ys_features = torch.tensor([article_features[i] for i in ys.cpu()], dtype=torch.double).to(DEVICE)
+        print("ffeatures ", torch.sum(torch.sum(ys_features)))
         # ys_features = torch.cat([ys_features, article_features[torch.unsqueeze(next_word.cpu(), 0)]], dim=0)
     return ys
 
