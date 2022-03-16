@@ -3,9 +3,17 @@ import numpy as np
 from typing import Iterable, List, Optional
 
 # Define special symbols and indices
-UNK_IDX, PAD_IDX, BOS_IDX, EOS_IDX = 0, 1, 2, 3
+SOS_idx = 0
+EOS_idx = 1
+UNK_idx = 2
+PAD_idx = 3
+
 # Make sure the tokens are in order of their indices to properly insert them in vocab
-special_symbols = ['<unk>', '<pad>', '<bos>', '<eos>']
+SOS_token = '<start>'
+EOS_token = '<end>'
+UNK_token = '<unk>'
+PAD_token = '<pad>'
+special_symbols = [SOS_token, EOS_token, UNK_token, PAD_token]
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -21,8 +29,8 @@ def create_mask(src, tgt):
     tgt_mask = generate_square_subsequent_mask(tgt_seq_len)
     src_mask = torch.zeros((src_seq_len, src_seq_len), device=DEVICE).type(torch.bool)
 
-    src_padding_mask = (src == PAD_IDX).transpose(0, 1)
-    tgt_padding_mask = (tgt == PAD_IDX).transpose(0, 1)
+    src_padding_mask = (src == PAD_idx).transpose(0, 1)
+    tgt_padding_mask = (tgt == PAD_idx).transpose(0, 1)
     return src_mask, tgt_mask, src_padding_mask, tgt_padding_mask
 
 def token_transform(seq):
