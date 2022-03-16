@@ -325,7 +325,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
                 break
             # torch.save(src, 'src.bin')
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
-            print(src_features)
+            print(torch.sum(src_features, 0))
             num_tokens = src.shape[0]
             src_mask = (torch.zeros(num_tokens, num_tokens)).type(torch.bool)
             # print("SRC ", src)
