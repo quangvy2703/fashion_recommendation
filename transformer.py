@@ -156,12 +156,11 @@ def preprocess_test(transactions, vocab):
     cus_ids = []
     trans = []
     customer_ids = transactions.keys()
-    print(vocab.article2index.keys())
     for customer_id in tqdm(customer_ids, desc="Removing rare articles..."):
         session = transactions[customer_id]
         tran = []
         print("Session ", session)
-        session = [art if art in vocab.article2index.keys() else UNK_token for art in session]
+        session = [art if str(art) in vocab.article2index.keys() else UNK_token for art in session]
         print("Token ", session)
         if len(session) > max_length:
             session = session[-max_length: ]           
