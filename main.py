@@ -172,7 +172,7 @@ def gen_test_data(transactions_df):
     transactions_df['t_dat'] = pd.to_datetime(transactions_df['t_dat'], format="%Y-%m-%d")
     trans_by_cus = transactions_df.groupby(['customer_id'])
     customer_ids = transactions_df.customer_id.unique()
-    trans_by_cus = trans_by_cus.groupby(['customer_id'])
+
     customer_sequences = {}
     for customer_id in tqdm(customer_ids, total=len(customer_ids), desc=f"{len(customer_sequences.keys())}"):
         transaction_of_customer = trans_by_cus.get_group(customer_id).groupby(['t_dat']).agg(','.join).reset_index()
