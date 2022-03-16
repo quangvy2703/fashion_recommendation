@@ -328,10 +328,10 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
             num_tokens = src.shape[0]
             src_mask = (torch.zeros(num_tokens, num_tokens)).type(torch.bool)
-            # print("SRC ", src)
+            print("SRC ", src)
             tgt_ids = greedy_decode(
                 model,  src, src_features, src_mask,  MAX_SEQUENCE_LENGTH, start_symbol=BOS_IDX)
-            # print("TGT_IDS ", tgt_ids)
+            print("TGT_IDS ", tgt_ids)
             #tgt_tokens max_len x batch_size
             for i in range(tgt_ids.shape[1]):
                 tgt_id = tgt_ids.cpu().numpy()[:, i]
