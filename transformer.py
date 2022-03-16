@@ -156,7 +156,7 @@ def preprocess_test(transactions, vocab):
     cus_ids = []
     trans = []
     customer_ids = transactions.keys()
-
+    print(vocab.article2index.keys()[:20])
     for customer_id in tqdm(customer_ids, desc="Removing rare articles..."):
         session = transactions[customer_id]
         tran = []
