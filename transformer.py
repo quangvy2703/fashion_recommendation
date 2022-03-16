@@ -275,6 +275,8 @@ def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"
         session_tensor, _ = tensor_from_pair(vocab, session, session, max_seq_length)
         print(session, session_tensor)
         X_test.append(session_tensor)
+        if len(X_test) > 10:
+            break
     
     X_test = torch.cat(X_test, dim=-1)
     torch.save(X_test, os.path.join(saved_data_dir, 'X_test.bin'))
