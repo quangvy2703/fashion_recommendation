@@ -285,6 +285,7 @@ def prepare_testdata(data_dir="datasets_transformer", saved_data_dir="saved_dir"
 def greedy_decode(model, src, src_features, src_mask, max_len, start_symbol):
     src = src.to(DEVICE)
     src_features = src_features.to(DEVICE)
+    src_mask = src_mask.to(DEVICE)
     memory = model.encode(src, src_features, src_mask)
     ys = torch.ones(1, src.shape[1]).fill_(start_symbol).type(torch.long).to(DEVICE)
     ys_features = torch.zeros(1, src.shape[1], src_features.shape[2]).type(torch.double).to(DEVICE)
