@@ -298,7 +298,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
     ys_features = torch.zeros(1, src.shape[1], src_features.shape[2]).type(torch.double).to(DEVICE)
     for i in range(max_len-1):
         memory = memory.to(DEVICE)
-        tgt_mask = generate_square_subsequent_mask(ys.size(0)).type(torch.bool)).to(DEVICE)
+        tgt_mask = generate_square_subsequent_mask(ys.size(0)).type(torch.bool).to(DEVICE)
         out = model.decode(ys, ys_features, memory, tgt_mask)
         # out seq_len x batch_size x output_dim
         out = out.transpose(0, 1)
