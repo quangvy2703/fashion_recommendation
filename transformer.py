@@ -468,7 +468,7 @@ def evaluate(model, loss_fn, X_valid, Y_valid, article_features, batch_size, epo
         # predicted += tgt_tokens
         t.set_description(f'Evaluating epoch {epoch+1} - step {step} - loss {batch_loss}')
     saved = {}
-    print(np.shape(np.transpose(predicted)), np.shape(np.transpose(targets)))
+    # print(np.shape(np.transpose(predicted)), np.shape(np.transpose(targets)))
     saved['target'] = np.transpose(targets)
     saved['predict'] = np.transpose(predicted)
     np.save('targets.npy', saved['target'])
@@ -527,8 +527,8 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 
     # optimizer = torch.optim.Adam(transformer.parameters(), lr=cfg["LR"], betas=(0.9, 0.98), eps=1e-9)
     optimizer = torch.optim.SGD(transformer.parameters(), lr=cfg["LR"], momentum=0.9)
-    val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, last_epoch)
-    print((f"Epoch: {last_epoch}, Train loss: 0.0, Val loss: {val_loss:.3f}, MAP@12: {map}"))
+    # val_loss, map = evaluate(transformer, loss_fn, X_valid, Y_valid, article_features, BATCH_SIZE, last_epoch)
+    # print((f"Epoch: {last_epoch}, Train loss: 0.0, Val loss: {val_loss:.3f}, MAP@12: {map}"))
 
     for epoch in range(last_epoch + 1, N_EPOCHS):       
         train_loss = train_epoch(transformer, optimizer, loss_fn, BATCH_SIZE, X_train, Y_train, article_features, epoch)
