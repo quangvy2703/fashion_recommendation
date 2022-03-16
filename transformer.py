@@ -298,7 +298,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
     ys_features = torch.zeros(1, src.shape[1], src_features.shape[2]).type(torch.double).to(DEVICE)
     for i in range(max_len-1):
         memory = memory.to(DEVICE)
-        tgt_mask = (generate_square_subsequent_mask(ys.size(0)).type(torch.bool)).to(DEVICE)
+        tgt_mask = generate_square_subsequent_mask(ys.size(0)).type(torch.bool)).to(DEVICE)
         out = model.decode(ys, ys_features, memory, tgt_mask)
         # out seq_len x batch_size x output_dim
         out = out.transpose(0, 1)
@@ -558,6 +558,8 @@ def test_transformer(saved_data_dir, epoch):
     
     customer_path = os.path.join(saved_data_dir, 'customer_ids_test.bin')
     model = torch.load(model_path)
+    model = model.double()
+    model = model.to(DEVICE)
     X_test = torch.load(data_path)
     customer_ids = torch.load(customer_path)
     vocab = Vocab()
@@ -686,7 +688,9 @@ class Seq2SeqTransformer(nn.Module):
         return output
 
     def encode(self, src: Tensor, src_features: Tensor, src_mask: Tensor):
-        output = self.transformer.encoder(self.article_emb(self.token_emb(src), src_features), src_mask)
+        output = self.token_emb(src)
+        output = self.article_emb(output, src_features)
+        output = self.transformer.encoder(output, src_mask)
         return output
 
     def decode(self, tgt: Tensor, tgt_features: Tensor, memory: Tensor, tgt_mask: Tensor):
