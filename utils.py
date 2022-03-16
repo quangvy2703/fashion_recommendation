@@ -97,6 +97,9 @@ def average_precision_at_k(y_true, y_pred, k=12):
     y_true = np.array(y_true)
     y_true = y_true[y_true > 4]
     y_true_clone = y_true.copy()
+    for i in range(0, 4):
+        y_true_clone = y_true_clone[y_true_clone != i]
+        
     for i in range(1, k+1):
         # print(i, y_true, y_pred)
         res, rem = rel_at_k(y_true_clone, y_pred, i)
