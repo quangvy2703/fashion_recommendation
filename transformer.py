@@ -337,7 +337,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, Y_test:Tensor, customer_id
 #  src_features = [article_features[i] for i in src]
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)), total=total_batches):
             src = X_test[:, batch]
-            tgt = Y_test[:, batch]
+            tgt = Y_test[:, batch].cpu()
             if step == 10:
                 break
             # torch.save(src, 'src.bin')
@@ -358,7 +358,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, Y_test:Tensor, customer_id
                     token = '0' + str(token)
                     tgt_tokens_str += token
                     tgt_tokens_str += ' '
-                tgt_true_tokens = [vocab.index2article[_id] for _id in tgt[:, i] if _id not in ADD_TOKENS]
+                tgt_true_tokens = [vocab.index2article[_id.item()] for _id in tgt[:, i] if _id not in ADD_TOKENS]
                 print(tgt_tokens_str, tgt_true_tokens, '\n')
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens_str
                 # targets[customer_ids[batch_size*step + i]] = tgt
