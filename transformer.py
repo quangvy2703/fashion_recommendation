@@ -324,7 +324,7 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
     return ys
 
 # actual function to translate input sentence into target language
-def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_features, batch_size, vocab):
+def translate(model: torch.nn.Module, X_test: Tensor, Y_test:Tensor, customer_ids, article_features, batch_size, vocab):
     model.eval()
     all_customer_ids = pd.read_csv(os.path.join(cfg['DATA_DIR'], 'customers.csv')).customer_id.values
     total_batches = int(X_test.shape[1]/batch_size) + 1
@@ -333,11 +333,13 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
     batch_loss = 0
     # torch.save("customer_ids.bin", cust)
     predicted = {}
+    targets = {}
 #  src_features = [article_features[i] for i in src]
     for step, batch in tqdm(enumerate(batch_generator(indices, batch_size)), total=total_batches):
             src = X_test[:, batch]
-            # if step == 10:
-            #     break
+            tgt = Y_test[:, batch]
+            if step == 10:
+                break
             # torch.save(src, 'src.bin')
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
             num_tokens = src.shape[0]
@@ -356,7 +358,9 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
                     token = '0' + str(token)
                     tgt_tokens_str += token
                     tgt_tokens_str += ' '
+                print(tgt_tokens_str, tgt[:, i])
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens_str
+                # targets[customer_ids[batch_size*step + i]] = tgt
     
     remain_customer_ids = list(set(all_customer_ids) - set(predicted.keys()))
     for customer_id in remain_customer_ids:
@@ -564,7 +568,8 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
         #         break    
 
 def test_transformer(saved_data_dir, epoch):
-    data_path = os.path.join(saved_data_dir, 'X_test.bin')
+    data_path = os.path.join(saved_data_dir, 'X_valid.bin')
+    data_y_path = os.path.join(saved_data_dir, 'Y_valid.bin')
     if os.path.exists(data_path) is False:
         prepare_testdata(data_dir=cfg['DATA_DIR'], saved_data_dir=saved_data_dir)
     # model_path = os.path.join(saved_data_dir, f'model_epoch{epoch}.pth')
@@ -575,6 +580,7 @@ def test_transformer(saved_data_dir, epoch):
     model = model.double()
     model = model.to(DEVICE)
     X_test = torch.load(data_path)
+    Y_test = torch.load(data_y_path)
     customer_ids = torch.load(customer_path)
     vocab = Vocab()
     vocab = vocab.from_file(saved_data_dir + '/vocab.txt')
@@ -582,7 +588,7 @@ def test_transformer(saved_data_dir, epoch):
     vocab.get_article_features(cfg['DATA_DIR'] + '/articles_processed.pkl')
     article_features = np.array(vocab.article_features, dtype=np.double)
 
-    translate(model, X_test, customer_ids, article_features, cfg['BATCH_SIZE'], vocab)
+    translate(model, X_test, Y_test, customer_ids, article_features, cfg['BATCH_SIZE'], vocab)
     
 
 class CustomerEmbedding(nn.Module):
