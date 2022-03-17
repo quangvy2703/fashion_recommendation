@@ -36,6 +36,7 @@ EOS_idx = 1
 UNK_idx = 2
 PAD_idx = 3
 
+ADD_TOKENS = [SOS_idx, EOS_idx, UNK_idx, PAD_idx]
 
 class Vocab:
     def __init__(self):
@@ -336,16 +337,20 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
             src_features = torch.tensor([article_features[i] for i in src], dtype=torch.double)    
             num_tokens = src.shape[0]
             src_mask = (torch.zeros(num_tokens, num_tokens)).type(torch.bool)
-            print("SRC ", src)
+            # print("SRC ", src)
             tgt_ids = greedy_decode(
                 model,  src, src_features, src_mask, article_features,  MAX_SEQUENCE_LENGTH, start_symbol=SOS_idx)
-            print("TGT_IDS ", tgt_ids)
+            # print("TGT_IDS ", tgt_ids)
             #tgt_tokens max_len x batch_size
             for i in range(tgt_ids.shape[1]):
                 tgt_id = tgt_ids.cpu().numpy()[:, i]
-                tgt_tokens = [vocab.index2article[_id] for _id in tgt_id]
+                tgt_tokens = [vocab.index2article[_id] for _id in tgt_id if _id not in ADD_TOKENS]
                 # print(tgt_tokens)
-                predicted[customer_ids[batch_size*step + i]] = tgt_tokens
+                tgt_tokens_str = ""
+                for token in tgt_tokens:
+                    tgt_tokens_str += token
+                    tgt_tokens_str += '\n'
+                predicted[customer_ids[batch_size*step + i]] = tgt_tokens_str
     
     remain_customer_ids = list(set(all_customer_ids) - set(predicted.keys()))
     for customer_id in remain_customer_ids:
