@@ -315,8 +315,8 @@ def greedy_decode(model, src, src_features, src_mask, article_features, max_len,
         ys = torch.cat([ys, torch.unsqueeze(next_word, 0)], dim=0)
         # ys_features = torch.tensor([article_features[i] for i in ys.cpu()], dtype=torch.double).to(DEVICE)
         # print("ffeatures ", torch.sum(torch.sum(ys_features)))
-        new_af = [article_features[word] for word in ys.cpu()[-1]]
-        ys_features = torch.cat([ys_features, torch.tensor(new_af, dtype=torch.double).to(DEVICE)], dim=0).to(DEVICE)
+        # new_af = [article_features[word] for word in ys.cpu()[-1]]
+        # ys_features = torch.cat([ys_features, torch.tensor(new_af, dtype=torch.double).to(DEVICE)], dim=0).to(DEVICE)
     return ys
 
 # actual function to translate input sentence into target language
