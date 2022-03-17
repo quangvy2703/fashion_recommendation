@@ -354,12 +354,12 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
                 tgt_tokens_str = ""
                 for token in tgt_tokens:
                     tgt_tokens_str += token
-                    tgt_tokens_str += '\n'
+                    tgt_tokens_str += ' '
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens_str
     
     remain_customer_ids = list(set(all_customer_ids) - set(predicted.keys()))
     for customer_id in remain_customer_ids:
-        predicted[customer_id] = tgt_tokens
+        predicted[customer_id] = tgt_tokens_str
     assert len(predicted.keys()) == 1371980, f"Len submission file is {len(predicted.keys())} mismatch 1371980"
     predicted_df = pd.DataFrame({'customer_id': predicted.keys(), 
                                 'prediction': predicted.values()})  
