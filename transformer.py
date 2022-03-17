@@ -572,8 +572,8 @@ def train_transfomer(X_train, Y_train, X_valid, Y_valid, saved_data_dir):
 def test_transformer(saved_data_dir, epoch):
     data_path = os.path.join(saved_data_dir, 'X_valid.bin')
     data_y_path = os.path.join(saved_data_dir, 'Y_valid.bin')
-    if os.path.exists(data_path) is False:
-        prepare_testdata(data_dir=cfg['DATA_DIR'], saved_data_dir=saved_data_dir)
+    # if os.path.exists(data_path) is False:
+    prepare_testdata(data_dir=cfg['DATA_DIR'], saved_data_dir=saved_data_dir)
     # model_path = os.path.join(saved_data_dir, f'model_epoch{epoch}.pth')
     model_path = os.path.join(cfg['MODEL_PATH'])
     
