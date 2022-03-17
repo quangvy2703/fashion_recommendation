@@ -353,6 +353,7 @@ def translate(model: torch.nn.Module, X_test: Tensor, customer_ids, article_feat
                 # print(tgt_tokens)
                 tgt_tokens_str = ""
                 for token in tgt_tokens:
+                    token = '0' + str(token)
                     tgt_tokens_str += token
                     tgt_tokens_str += ' '
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens_str
