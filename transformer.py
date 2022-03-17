@@ -358,7 +358,8 @@ def translate(model: torch.nn.Module, X_test: Tensor, Y_test:Tensor, customer_id
                     token = '0' + str(token)
                     tgt_tokens_str += token
                     tgt_tokens_str += ' '
-                print(tgt_tokens_str, tgt[:, i])
+                tgt_true_tokens = [vocab.index2article[_id] for _id in tgt[:, i] if _id not in ADD_TOKENS]
+                print(tgt_tokens_str, tgt_true_tokens, '\n')
                 predicted[customer_ids[batch_size*step + i]] = tgt_tokens_str
                 # targets[customer_ids[batch_size*step + i]] = tgt
     
